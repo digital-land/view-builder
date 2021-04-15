@@ -1,5 +1,5 @@
 from sqlalchemy.orm import declarative_base, relationship
-from sqlalchemy import ForeignKey, Column, Integer, String
+from sqlalchemy import ForeignKey, Column, Integer, String, Date
 
 Base = declarative_base()
 
@@ -13,7 +13,7 @@ class Slug(Base):
     category = relationship("Category", back_populates="slug")
 
     def __repr__(self):
-        return f"Slug(id={self.id!r}, prefix={self.prefix!r}, slug={self.slug!r})"
+        return "Slug({})".format({key: getattr(self, key) for key in self.__table__.columns.keys()})
 
 
 class Category(Base):
@@ -23,9 +23,11 @@ class Category(Base):
     category = Column(String)
     reference = Column(String)
     name = Column(String)
+    start_date = Column(Date)
+    entry_date = Column(Date)
+    end_date = Column(Date)
 
     slug = relationship("Slug", back_populates="category")
 
     def __repr__(self):
-        return f"Category(id={self.id!r}, name={self.name!r}, category={self.category!r}, " \
-               f"reference={self.reference!r}, slug={self.slug!r})"
+        return "Category({})".format({key: getattr(self, key) for key in self.__table__.columns.keys()})

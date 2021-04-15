@@ -12,8 +12,13 @@ class DatasetORM:
         if not data.get("entry-date", None):
             raise ValueError("Entry missing entry-date")
 
-        self.entry_date = date.fromisoformat(data.pop("entry-date"))
-        if self.entry_date > date.today():
+        self.data["entry_date"] = date.fromisoformat(self.data.pop("entry-date"))
+        if "start-date" in self.data:
+            self.data["start_date"] = date.fromisoformat(self.data.pop("start-date"))
+        if "end-date" in self.data:
+            self.data["end_date"] = date.fromisoformat(self.data.pop("end-date"))
+
+        if self.data["entry_date"] > date.today():
             raise ValueError("entry-date cannot be in the future")
 
 
