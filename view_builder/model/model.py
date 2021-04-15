@@ -3,11 +3,12 @@ from sqlalchemy import ForeignKey, Column, Integer, String
 
 Base = declarative_base()
 
+
 class Slug(Base):
     __tablename__ = 'slug'
     id = Column(Integer, primary_key=True)
     prefix = Column(String)
-    slug = Column(String)
+    slug = Column(String, unique=True)
 
     category = relationship("Category", back_populates="slug")
 
