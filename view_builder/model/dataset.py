@@ -1,8 +1,25 @@
 from datetime import date
-from view_builder.model.model import Slug, Category
+from view_builder.model.table import Slug, Category
 
 
-class DatasetORM:
+class DatasetModelFactory:
+    def __init__(self):
+        self._dataset_models = {}
+
+    def register_dataset_model(self, name, model_class):
+        self._dataset_models[name] = model_class
+
+    def get_dataset_model(self, name, data: dict):
+        model_class = self._dataset_models.get(name)
+        if not model_class:
+            raise ValueError("No matching dataset model found")
+        return model_class(data)
+
+
+factory = DatasetModelFactory()
+
+
+class DatasetModel:
     def __init__(self, data: dict):
         self.data = data
 
@@ -22,12 +39,13 @@ class DatasetORM:
             raise ValueError("entry-date cannot be in the future")
 
 
-class DeveloperAgreementTypeORM(DatasetORM):
+class DeveloperAgreementTypeModel(DatasetModel):
     def __init__(self, data: dict):
         super().__init__(data)
         self.slug = {key: data[key] for key in Slug.__table__.columns.keys() if key in data}
         self.category = {key: data[key] for key in Category.__table__.columns.keys() if key in data}
-        self.category["reference"] = data["developer-agreement-type"]
+        if "reference" not in self.category and "developer-agreement-type" in data:
+            self.category["reference"] = data["developer-agreement-type"]
         # Add check for presence of key field ?
 
     def to_orm(self):
@@ -36,4 +54,5 @@ class DeveloperAgreementTypeORM(DatasetORM):
         return category
 
 
+factory.register_dataset_model("developer-agreement-type", DeveloperAgreementTypeModel)
 
