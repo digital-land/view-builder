@@ -6,8 +6,8 @@ class DatasetModelFactory:
     def __init__(self):
         self._dataset_models = {}
 
-    def register_dataset_model(self, name, model_class):
-        self._dataset_models[name] = model_class
+    def register_dataset_model(self, model_class):
+        self._dataset_models[model_class.dataset_name] = model_class
 
     def get_dataset_model(self, name, data: dict):
         model_class = self._dataset_models.get(name)
@@ -40,10 +40,17 @@ class DatasetModel:
 
 
 class DeveloperAgreementTypeModel(DatasetModel):
+
+    dataset_name = "developer-agreement-type"
+
     def __init__(self, data: dict):
-        super().__init__(data)
-        self.slug = {key: data[key] for key in Slug.__table__.columns.keys() if key in data}
-        self.category = {key: data[key] for key in Category.__table__.columns.keys() if key in data}
+        DatasetModel.__init__(self, data)
+        self.slug = {
+            key: data[key] for key in Slug.__table__.columns.keys() if key in data
+        }
+        self.category = {
+            key: data[key] for key in Category.__table__.columns.keys() if key in data
+        }
         if "reference" not in self.category and "developer-agreement-type" in data:
             self.category["reference"] = data["developer-agreement-type"]
         # Add check for presence of key field ?
@@ -51,8 +58,7 @@ class DeveloperAgreementTypeModel(DatasetModel):
     def to_orm(self):
         slug = Slug(**self.slug)
         category = Category(**self.category, slug=slug)
-        return category
+        return [category]
 
 
-factory.register_dataset_model("developer-agreement-type", DeveloperAgreementTypeModel)
-
+factory.register_dataset_model(DeveloperAgreementTypeModel)
