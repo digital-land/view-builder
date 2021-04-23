@@ -1,5 +1,5 @@
-import view_builder.builder
 import pytest
+import view_builder.builder
 from view_builder.builder import ViewBuilder
 from unittest.mock import call
 
@@ -15,6 +15,6 @@ def mock_session(mocker):
 @pytest.mark.usefixtures("mock_session")
 def test_view_builder(mock_session):
     test_items = [[{"obj1": "value1"}], [{"obj2": "value2"}]]
-    test_builder = ViewBuilder(engine=None, item_mapper=lambda x, y: y)
+    test_builder = ViewBuilder(engine=None, item_mapper=lambda x, y, z: z)
     test_builder.build_model("test_dataset", test_items)
     mock_session.add.assert_has_calls([call(test_items[0][0]), call(test_items[1][0])])

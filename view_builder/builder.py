@@ -17,7 +17,7 @@ class ViewBuilder:
     def build_model(self, dataset_name, reader):
         with Session(self._engine) as session:
             for item in reader:
-                orm_objects = self._item_mapper(dataset_name, item)
+                orm_objects = self._item_mapper(dataset_name, session, item)
                 for obj in orm_objects:
                     session.add(obj)
 

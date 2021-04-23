@@ -13,11 +13,26 @@ def cli():
     pass
 
 
+@click.command("create", short_help="create the view model tables")
+@click.argument("output_path", type=click.Path(exists=False))
+def create(output_path):
+    engine = create_engine("sqlite+pysqlite:///{}".format(output_path))
+    builder = ViewBuilder(
+        engine=engine,
+        item_mapper=None,
+    )
+    builder.init_model(Base.metadata)
+
+
+cli.add_command(create)
+
+
 @click.command("build", short_help="build the view model for a single dataset")
 @click.argument("dataset_name", type=click.STRING)
 @click.argument("input_path", type=click.Path(exists=True))
 @click.argument("output_path", type=click.Path(exists=False))
-def build(dataset_name, input_path, output_path):
+@click.option("-d", "--debug")
+def build(dataset_name, input_path, output_path, debug):
     entry_repo = EntryRepository(input_path)
     entities = entry_repo.list_entities()
     reader = (
@@ -26,9 +41,10 @@ def build(dataset_name, input_path, output_path):
     engine = create_engine("sqlite+pysqlite:///{}".format(output_path))
     builder = ViewBuilder(
         engine=engine,
-        item_mapper=lambda name, item: dataset_model_factory.get_dataset_model(
-            name, item
+        item_mapper=lambda name, session, item: dataset_model_factory.get_dataset_model(
+            name, session, item
         ).to_orm(),
+        log=debug,
     )
     builder.init_model(Base.metadata)
     builder.build_model(dataset_name, reader)
