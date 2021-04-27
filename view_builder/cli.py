@@ -28,11 +28,11 @@ cli.add_command(create)
 
 
 @click.command("build", short_help="build the view model for a single dataset")
+@click.option("-d", "--debug/--no-debug", default=False)
 @click.argument("dataset_name", type=click.STRING)
 @click.argument("input_path", type=click.Path(exists=True))
 @click.argument("output_path", type=click.Path(exists=False))
-@click.option("-d", "--debug")
-def build(dataset_name, input_path, output_path, debug):
+def build(debug, dataset_name, input_path, output_path):
     entry_repo = EntryRepository(input_path)
     entities = entry_repo.list_entities()
     reader = (

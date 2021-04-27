@@ -13,11 +13,20 @@ class Slug(Base):
     category = relationship("Category", back_populates="slug")
     geography = relationship("Geography", back_populates="slug")
     document = relationship("Document", back_populates="slug")
+    policy = relationship("Policy", back_populates="slug")
 
     def __repr__(self):
         return "Slug({})".format(
             {key: getattr(self, key) for key in self.__table__.columns.keys()}
         )
+
+
+policy_category = Table(
+    "policy_category",
+    Base.metadata,
+    Column("policy", Integer, ForeignKey("policy.id")),
+    Column("category", Integer, ForeignKey("category.id")),
+)
 
 
 class Category(Base):
@@ -27,13 +36,15 @@ class Category(Base):
     category = Column(String, unique=True)
     reference = Column(String)
     name = Column(String)
-    start_date = Column(Date)
     entry_date = Column(Date)
+    start_date = Column(Date)
     end_date = Column(Date)
 
     slug = relationship("Slug", back_populates="category")
-    policy = relationship("Policy", back_populates="category")
     document = relationship("Document", back_populates="category")
+    policies = relationship(
+        "Policy", secondary=policy_category, back_populates="categories"
+    )
 
     def __repr__(self):
         return "Category({})".format(
@@ -48,12 +59,14 @@ class Organisation(Base):
     organisation = Column(String, unique=True)
     reference = Column(String)
     name = Column(String)
+    entry_date = Column(Date)
     start_date = Column(Date)
     end_date = Column(Date)
 
     # TODO: add relationships
     document = relationship("Document", back_populates="organisation")
     geographies = relationship("OrganisationGeography", back_populates="organisation")
+    policies = relationship("PolicyOrganisation", back_populates="organisation")
 
     def __repr__(self):
         return "Organisation({})".format(
@@ -68,12 +81,14 @@ class Geography(Base):
     geography = Column(String, unique=True)
     geometry = Column(String)
     name = Column(String)
+    entry_date = Column(Date)
     start_date = Column(Date)
     end_date = Column(Date)
 
     slug = relationship("Slug", back_populates="geography")
     document = relationship("Document", back_populates="geography")
-    organisation = relationship("OrganisationGeography", back_populates="geography")
+    organisations = relationship("OrganisationGeography", back_populates="geography")
+    policies = relationship("PolicyGeography", back_populates="geography")
 
     def __repr__(self):
         return "Geography({})".format(
@@ -85,9 +100,10 @@ class OrganisationGeography(Base):
     __tablename__ = "organisation_geography"
     organisation_id = Column(Integer, ForeignKey("organisation.id"), primary_key=True)
     geography_id = Column(Integer, ForeignKey("geography.id"), primary_key=True)
+    entry_date = Column(Date)
     start_date = Column(Date)
     end_date = Column(Date)
-    geography = relationship("Geography", back_populates="organisation")
+    geography = relationship("Geography", back_populates="organisations")
     organisation = relationship("Organisation", back_populates="geographies")
 
 
@@ -95,27 +111,57 @@ policy_document = Table(
     "policy_document",
     Base.metadata,
     Column("policy", Integer, ForeignKey("policy.id")),
-    Column("document_id", Integer, ForeignKey("document.id")),
+    Column("document", Integer, ForeignKey("document.id")),
 )
 
 
 class Policy(Base):
     __tablename__ = "policy"
     id = Column(Integer, primary_key=True)
-    prefix = Column(String)  # Should this be a foreign key to slug.prefix ?
-    category_id = Column(Integer, ForeignKey("category.id"))
+    slug_id = Column(Integer, ForeignKey("slug.id"))
+    policy = Column(String, unique=True)
     reference = Column(String)
-    name = Column(String, unique=True)
+    name = Column(String)
+    entry_date = Column(Date)
+    start_date = Column(Date)
+    end_date = Column(Date)
 
-    category = relationship("Category", back_populates="policy")
+    slug = relationship("Slug", back_populates="policy")
     documents = relationship(
         "Document", secondary=policy_document, back_populates="policies"
     )
+    categories = relationship(
+        "Category", secondary=policy_category, back_populates="policies"
+    )
+    geographies = relationship("PolicyGeography", back_populates="policy")
+    organisations = relationship("PolicyOrganisation", back_populates="policy")
 
     def __repr__(self):
         return "Policy({})".format(
             {key: getattr(self, key) for key in self.__table__.columns.keys()}
         )
+
+
+class PolicyGeography(Base):
+    __tablename__ = "policy_geography"
+    policy_id = Column(Integer, ForeignKey("policy.id"), primary_key=True)
+    geography_id = Column(Integer, ForeignKey("geography.id"), primary_key=True)
+    entry_date = Column(Date)
+    start_date = Column(Date)
+    end_date = Column(Date)
+    geography = relationship("Geography", back_populates="policies")
+    policy = relationship("Policy", back_populates="geographies")
+
+
+class PolicyOrganisation(Base):
+    __tablename__ = "policy_organisation"
+    policy_id = Column(Integer, ForeignKey("policy.id"), primary_key=True)
+    organisation_id = Column(Integer, ForeignKey("organisation.id"), primary_key=True)
+    entry_date = Column(Date)
+    start_date = Column(Date)
+    end_date = Column(Date)
+    organisation = relationship("Organisation", back_populates="policies")
+    policy = relationship("Policy", back_populates="organisations")
 
 
 class Document(Base):
@@ -131,6 +177,7 @@ class Document(Base):
     description = Column(String)
     category_id = Column(Integer, ForeignKey("category.id"))
     document_url = Column(String)
+    entry_date = Column(Date)
     start_date = Column(Date)
     end_date = Column(Date)
 
