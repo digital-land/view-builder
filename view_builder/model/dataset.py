@@ -288,7 +288,8 @@ class DevelopmentPlanDocumentModel(DatasetModel):
         if "document" not in self.document and self.dataset_name in self.data:
             self.document["document"] = self.data[self.dataset_name]
 
-        self.category = self.data["development-plan-types"]
+        self.categories = self.data["development-plan-types"].split(";") \
+            if "development-plan-types" in self.data else []
         self.policies = (
             self.data["development-policies"].split(";")
             if "development-policies" in self.data
@@ -308,15 +309,17 @@ class DevelopmentPlanDocumentModel(DatasetModel):
         slug = Slug(**self.slug)
         document = Document(**self.document, slug=slug)
         document.policies = []
+        document.categories = []
 
         def category_callback(category):
             return self.get_category(category=category, type="development-plan-type")
 
-        category_orm = self.find_relation(
-            category_callback, document, self.category, allow_broken_relationships
-        )
-        if category_orm:
-            document.category = category_orm
+        for category in self.categories:
+            category_orm = self.find_relation(
+                category_callback, document, category, allow_broken_relationships
+            )
+            if category_orm:
+                document.categories.append(category_orm)
 
         for policy in self.policies:
             policy_orm = self.find_relation(

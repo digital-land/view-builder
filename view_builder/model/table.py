@@ -36,6 +36,13 @@ policy_category = Table(
     Column("category", Integer, ForeignKey("category.id")),
 )
 
+document_category = Table(
+    "document_category",
+    Base.metadata,
+    Column("category", Integer, ForeignKey("category.id")),
+    Column("document", Integer, ForeignKey("document.id")),
+)
+
 
 class Category(Base):
     __tablename__ = "category"
@@ -52,7 +59,9 @@ class Category(Base):
     __table_args__ = (UniqueConstraint("category", "type"),)
 
     slug = relationship("Slug", back_populates="category")
-    document = relationship("Document", back_populates="category")
+    documents = relationship(
+        "Document", secondary=document_category, back_populates="categories"
+    )
     policies = relationship(
         "Policy", secondary=policy_category, back_populates="categories"
     )
@@ -180,18 +189,19 @@ class Document(Base):
     id = Column(Integer, primary_key=True)
     slug_id = Column(Integer, ForeignKey("slug.id"))
     prefix = Column(String)
-    document = Column(String, unique=True)
+    document = Column(String)
     reference = Column(String)
     name = Column(String)
     description = Column(String)
-    category_id = Column(Integer, ForeignKey("category.id"))
     document_url = Column(String)
     entry_date = Column(Date)
     start_date = Column(Date)
     end_date = Column(Date)
 
     slug = relationship("Slug", back_populates="document")
-    category = relationship("Category", back_populates="document")
+    categories = relationship(
+        "Category", secondary=document_category, back_populates="documents"
+    )
     policies = relationship(
         "Policy", secondary=policy_document, back_populates="documents"
     )
