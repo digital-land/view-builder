@@ -1,5 +1,13 @@
 from sqlalchemy.orm import declarative_base, relationship
-from sqlalchemy import Table, ForeignKey, Column, Integer, String, Date
+from sqlalchemy import (
+    Table,
+    ForeignKey,
+    Column,
+    Integer,
+    String,
+    Date,
+    UniqueConstraint,
+)
 
 Base = declarative_base()
 
@@ -33,12 +41,15 @@ class Category(Base):
     __tablename__ = "category"
     id = Column(Integer, primary_key=True)
     slug_id = Column(Integer, ForeignKey("slug.id"))
-    category = Column(String, unique=True)
+    category = Column(String)
+    type = Column(String)
     reference = Column(String)
     name = Column(String)
     entry_date = Column(Date)
     start_date = Column(Date)
     end_date = Column(Date)
+
+    __table_args__ = (UniqueConstraint("category", "type"),)
 
     slug = relationship("Slug", back_populates="category")
     document = relationship("Document", back_populates="category")
@@ -64,9 +75,9 @@ class Organisation(Base):
     end_date = Column(Date)
 
     # TODO: add relationships
-    document = relationship("Document", back_populates="organisation")
     geographies = relationship("OrganisationGeography", back_populates="organisation")
     policies = relationship("PolicyOrganisation", back_populates="organisation")
+    documents = relationship("DocumentOrganisation", back_populates="organisation")
 
     def __repr__(self):
         return "Organisation({})".format(
@@ -86,9 +97,9 @@ class Geography(Base):
     end_date = Column(Date)
 
     slug = relationship("Slug", back_populates="geography")
-    document = relationship("Document", back_populates="geography")
     organisations = relationship("OrganisationGeography", back_populates="geography")
     policies = relationship("PolicyGeography", back_populates="geography")
+    documents = relationship("DocumentGeography", back_populates="geography")
 
     def __repr__(self):
         return "Geography({})".format(
@@ -171,8 +182,6 @@ class Document(Base):
     prefix = Column(String)
     document = Column(String, unique=True)
     reference = Column(String)
-    organisation_id = Column(Integer, ForeignKey("organisation.id"))
-    geography_id = Column(Integer, ForeignKey("geography.id"))
     name = Column(String)
     description = Column(String)
     category_id = Column(Integer, ForeignKey("category.id"))
@@ -182,14 +191,36 @@ class Document(Base):
     end_date = Column(Date)
 
     slug = relationship("Slug", back_populates="document")
-    organisation = relationship("Organisation", back_populates="document")
-    geography = relationship("Geography", back_populates="document")
     category = relationship("Category", back_populates="document")
     policies = relationship(
         "Policy", secondary=policy_document, back_populates="documents"
     )
+    geographies = relationship("DocumentGeography", back_populates="document")
+    organisations = relationship("DocumentOrganisation", back_populates="document")
 
     def __repr__(self):
         return "Document({})".format(
             {key: getattr(self, key) for key in self.__table__.columns.keys()}
         )
+
+
+class DocumentGeography(Base):
+    __tablename__ = "document_geography"
+    document_id = Column(Integer, ForeignKey("document.id"), primary_key=True)
+    geography_id = Column(Integer, ForeignKey("geography.id"), primary_key=True)
+    entry_date = Column(Date)
+    start_date = Column(Date)
+    end_date = Column(Date)
+    geography = relationship("Geography", back_populates="documents")
+    document = relationship("Document", back_populates="geographies")
+
+
+class DocumentOrganisation(Base):
+    __tablename__ = "document_organisation"
+    document_id = Column(Integer, ForeignKey("document.id"), primary_key=True)
+    organisation_id = Column(Integer, ForeignKey("organisation.id"), primary_key=True)
+    entry_date = Column(Date)
+    start_date = Column(Date)
+    end_date = Column(Date)
+    organisation = relationship("Organisation", back_populates="documents")
+    document = relationship("Document", back_populates="organisations")

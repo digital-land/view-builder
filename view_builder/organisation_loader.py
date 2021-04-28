@@ -1,6 +1,5 @@
 import csv
 from view_builder.model.table import Organisation
-from view_builder.model.table import Base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from datetime import date

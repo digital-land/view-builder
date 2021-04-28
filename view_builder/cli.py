@@ -29,10 +29,13 @@ cli.add_command(create)
 
 @click.command("build", short_help="build the view model for a single dataset")
 @click.option("-d", "--debug/--no-debug", default=False)
+@click.option(
+    "-a", "--allow-broken-relationships/--no-broken-relationships", default=False
+)
 @click.argument("dataset_name", type=click.STRING)
 @click.argument("input_path", type=click.Path(exists=True))
 @click.argument("output_path", type=click.Path(exists=False))
-def build(debug, dataset_name, input_path, output_path):
+def build(debug, allow_broken_relationships, dataset_name, input_path, output_path):
     entry_repo = EntryRepository(input_path)
     entities = entry_repo.list_entities()
     reader = (
@@ -43,7 +46,7 @@ def build(debug, dataset_name, input_path, output_path):
         engine=engine,
         item_mapper=lambda name, session, item: dataset_model_factory.get_dataset_model(
             name, session, item
-        ).to_orm(),
+        ).to_orm(allow_broken_relationships),
         log=debug,
     )
     builder.init_model(Base.metadata)
