@@ -288,8 +288,11 @@ class DevelopmentPlanDocumentModel(DatasetModel):
         if "document" not in self.document and self.dataset_name in self.data:
             self.document["document"] = self.data[self.dataset_name]
 
-        self.categories = self.data["development-plan-types"].split(";") \
-            if "development-plan-types" in self.data else []
+        self.categories = (
+            self.data["development-plan-types"].split(";")
+            if "development-plan-types" in self.data
+            else []
+        )
         self.policies = (
             self.data["development-policies"].split(";")
             if "development-policies" in self.data
