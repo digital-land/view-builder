@@ -34,5 +34,8 @@ build: $(CACHE_DIR)organisation.csv $(VIEW_MODEL_DB)
 	view_builder build --allow-broken-relationships development-policy ../datasette-builder/data/development-policy.sqlite3 $(VIEW_MODEL_DB)
 	view_builder build --allow-broken-relationships development-plan-document ../datasette-builder/data/development-plan-document.sqlite3 $(VIEW_MODEL_DB)
 
+server:
+	datasette -m metadata.json view_model.db
+
 $(CACHE_DIR)organisation.csv:
 	curl -qs "https://raw.githubusercontent.com/digital-land/organisation-dataset/main/collection/organisation.csv" > $(CACHE_DIR)organisation.csv

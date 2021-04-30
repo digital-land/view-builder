@@ -1,0 +1,11 @@
+{
+    "databases": {
+        "view_model": {
+            "tables": {
+                "slug": {
+                    "label_column": "slug"
+                }
+            }
+        }
+    }
+}
