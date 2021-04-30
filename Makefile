@@ -8,10 +8,6 @@ all:: lint test
 test:
 	python -m pytest tests/
 
-# init:
-# 	pip install -r requirements.txt
-# 	pip install -e .
-
 lint: black-check flake8
 
 black-check:
@@ -38,4 +34,5 @@ server:
 	datasette -m metadata.json view_model.db
 
 $(CACHE_DIR)organisation.csv:
+	mkdir -p $(CACHE_DIR)
 	curl -qs "https://raw.githubusercontent.com/digital-land/organisation-dataset/main/collection/organisation.csv" > $(CACHE_DIR)organisation.csv
