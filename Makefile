@@ -31,6 +31,9 @@ build: $(CACHE_DIR)organisation.csv $(VIEW_MODEL_DB)
 	view_builder build --allow-broken-relationships development-plan-document ../datasette-builder/data/development-plan-document.sqlite3 $(VIEW_MODEL_DB)
 
 server:
+ifeq (,$(shell which datasette))
+    $(error datasette does not exist!)
+endif
 	datasette -m metadata.json view_model.db
 
 $(CACHE_DIR)organisation.csv:
