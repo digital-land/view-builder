@@ -59,9 +59,7 @@ def build(debug, allow_broken_relationships, dataset_name, input_path, output_pa
 cli.add_command(build)
 
 # Temporary command to load organisations from organisation.csv
-@click.command(
-    "load_organisations", short_help="load organisations into view model"
-)
+@click.command("load_organisations", short_help="load organisations into view model")
 @click.argument("output_path", type=click.Path(exists=False))
 def load_organisations(output_path):
     load_organisations_from_file(output_path)
