@@ -101,6 +101,7 @@ class Geography(Base):
     geography = Column(String, unique=True)
     geometry = Column(String)
     name = Column(String)
+    type = Column(String)
     entry_date = Column(Date)
     start_date = Column(Date)
     end_date = Column(Date)

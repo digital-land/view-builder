@@ -123,32 +123,7 @@ class CategoryDatasetModel(DatasetModel):
         return [category]
 
 
-class DeveloperAgreementTypeModel(CategoryDatasetModel):
-
-    dataset_name = "developer-agreement-type"
-
-    def __init__(self, session, data: dict):
-        CategoryDatasetModel.__init__(self, session, data)
-
-
-factory.register_dataset_model(DeveloperAgreementTypeModel)
-
-
-class DevelopmentPolicyCategoryModel(CategoryDatasetModel):
-
-    dataset_name = "development-policy-category"
-
-    def __init__(self, session, data: dict):
-        CategoryDatasetModel.__init__(self, session, data)
-
-
-factory.register_dataset_model(DevelopmentPolicyCategoryModel)
-
-
-class LocalAuthorityDistrictModel(DatasetModel):
-
-    dataset_name = "local-authority-district"
-
+class GeographyDatasetModel(DatasetModel):
     def __init__(self, session, data: dict):
         DatasetModel.__init__(self, session, data)
         self.slug = {
@@ -159,6 +134,7 @@ class LocalAuthorityDistrictModel(DatasetModel):
             for key in Geography.__table__.columns.keys()
             if key in self.data
         }
+        self.geography["type"] = self.dataset_name
 
     def to_orm(self, allow_broken_relationships=False):
         orms = []
@@ -182,7 +158,67 @@ class LocalAuthorityDistrictModel(DatasetModel):
         return orms
 
 
+class DeveloperAgreementTypeModel(CategoryDatasetModel):
+
+    dataset_name = "developer-agreement-type"
+
+    def __init__(self, session, data: dict):
+        CategoryDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(DeveloperAgreementTypeModel)
+
+
+class DevelopmentPolicyCategoryModel(CategoryDatasetModel):
+
+    dataset_name = "development-policy-category"
+
+    def __init__(self, session, data: dict):
+        CategoryDatasetModel.__init__(self, session, data)
+
+
+class DevelopmentPlanTypeModel(CategoryDatasetModel):
+
+    dataset_name = "development-plan-type"
+
+    def __init__(self, session, data: dict):
+        CategoryDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(DevelopmentPlanTypeModel)
+
+
+class DocumentTypeModel(CategoryDatasetModel):
+
+    dataset_name = "document-type"
+
+    def __init__(self, session, data: dict):
+        CategoryDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(DevelopmentPolicyCategoryModel)
+
+
+class LocalAuthorityDistrictModel(GeographyDatasetModel):
+
+    dataset_name = "local-authority-district"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
 factory.register_dataset_model(LocalAuthorityDistrictModel)
+
+
+class ConservationAreaModel(GeographyDatasetModel):
+
+    dataset_name = "conservation-area"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(ConservationAreaModel)
 
 
 class DevelopmentPolicyModel(DatasetModel):
@@ -258,17 +294,6 @@ class DevelopmentPolicyModel(DatasetModel):
 
 
 factory.register_dataset_model(DevelopmentPolicyModel)
-
-
-class DevelopmentPlanTypeModel(CategoryDatasetModel):
-
-    dataset_name = "development-plan-type"
-
-    def __init__(self, session, data: dict):
-        CategoryDatasetModel.__init__(self, session, data)
-
-
-factory.register_dataset_model(DevelopmentPlanTypeModel)
 
 
 class DevelopmentPlanDocumentModel(DatasetModel):
@@ -360,3 +385,92 @@ class DevelopmentPlanDocumentModel(DatasetModel):
 
 
 factory.register_dataset_model(DevelopmentPlanDocumentModel)
+
+
+class DocumentModel(DatasetModel):
+
+    dataset_name = "document"
+
+    def __init__(self, session, data: dict):
+        DatasetModel.__init__(self, session, data)
+        self.slug = {
+            key: data[key] for key in Slug.__table__.columns.keys() if key in self.data
+        }
+        self.document = {
+            key: data[key]
+            for key in Document.__table__.columns.keys()
+            if key in self.data
+        }
+
+        self.categories = (
+            self.data["document-types"].split(";")
+            if "document-types" in self.data
+            else []
+        )
+        self.policies = (
+            self.data["development-policies"].split(";")
+            if "development-policies" in self.data
+            else []
+        )
+        self.organisations = (
+            self.data["organisations"].split(";")
+            if "organisations" in self.data
+            else []
+        )
+        self.geographies = (
+            self.data["geographies"].split(";") if "geographies" in self.data else []
+        )
+
+    def to_orm(self, allow_broken_relationships=False):
+        orms = []
+        slug = Slug(**self.slug)
+        document = Document(**self.document, slug=slug)
+        document.policies = []
+        document.categories = []
+
+        def category_callback(category):
+            return self.get_category(category=category, type="document-type")
+
+        for category in self.categories:
+            category_orm = self.find_relation(
+                category_callback, document, category, allow_broken_relationships
+            )
+            if category_orm:
+                document.categories.append(category_orm)
+
+        for policy in self.policies:
+            policy_orm = self.find_relation(
+                self.get_policy, document, policy, allow_broken_relationships
+            )
+            if policy_orm:
+                document.policies.append(policy_orm)
+
+        orms.append(document)
+
+        for org in self.organisations:
+            org_orm = self.find_relation(
+                self.get_organisation, document, org, allow_broken_relationships
+            )
+            if org_orm:
+                relationship = DocumentOrganisation(
+                    organisation=org_orm, document=document
+                )
+                orms.append(relationship)
+
+        for geography in self.geographies:
+            geography_orm = self.find_relation(
+                self.get_geography,
+                document,
+                "conservation-area:" + geography,
+                allow_broken_relationships,
+            )
+            if geography_orm:
+                relationship = DocumentGeography(
+                    geography=geography_orm, document=document
+                )
+                orms.append(relationship)
+
+        return orms
+
+
+factory.register_dataset_model(DocumentModel)
