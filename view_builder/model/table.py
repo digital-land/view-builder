@@ -98,7 +98,7 @@ class Geography(Base):
     __tablename__ = "geography"
     id = Column(Integer, primary_key=True)
     slug_id = Column(Integer, ForeignKey("slug.id"))
-    geography = Column(String, unique=True)
+    geography = Column(String)
     geometry = Column(String)
     name = Column(String)
     type = Column(String)

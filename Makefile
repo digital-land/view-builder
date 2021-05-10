@@ -25,10 +25,13 @@ $(VIEW_MODEL_DB):
 build: $(CACHE_DIR)organisation.csv $(VIEW_MODEL_DB)
 	view_builder load_organisations $(VIEW_MODEL_DB)
 	view_builder build local-authority-district ../datasette-builder/data/local-authority-district.sqlite3 $(VIEW_MODEL_DB)
+	view_builder build conservation-area ../datasette-builder/data/conservation-area.sqlite3 $(VIEW_MODEL_DB)
 	view_builder build development-policy-category ../datasette-builder/data/development-policy-category.sqlite3 $(VIEW_MODEL_DB)
 	view_builder build development-plan-type ../datasette-builder/data/development-plan-type.sqlite3 $(VIEW_MODEL_DB)
+	view_builder build document-type ../datasette-builder/data/document-type.sqlite3 $(VIEW_MODEL_DB)
 	view_builder build --allow-broken-relationships development-policy ../datasette-builder/data/development-policy.sqlite3 $(VIEW_MODEL_DB)
 	view_builder build --allow-broken-relationships development-plan-document ../datasette-builder/data/development-plan-document.sqlite3 $(VIEW_MODEL_DB)
+	view_builder build --allow-broken-relationships document ../datasette-builder/data/document.sqlite3 $(VIEW_MODEL_DB)
 
 server:
 ifeq (,$(shell which datasette))

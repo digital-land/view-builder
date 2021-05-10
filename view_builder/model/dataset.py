@@ -82,6 +82,9 @@ class DatasetModel:
             self.session.query(Geography).filter(Geography.geography == geography).one()
         )
 
+    def get_slug(self, slug):
+        return self.session.query(Slug).filter(Slug.slug == slug).one()
+
     def get_policy(self, policy):
         return self.session.query(Policy).filter(Policy.policy == policy).one()
 
@@ -177,6 +180,9 @@ class DevelopmentPolicyCategoryModel(CategoryDatasetModel):
         CategoryDatasetModel.__init__(self, session, data)
 
 
+factory.register_dataset_model(DevelopmentPolicyCategoryModel)
+
+
 class DevelopmentPlanTypeModel(CategoryDatasetModel):
 
     dataset_name = "development-plan-type"
@@ -196,7 +202,7 @@ class DocumentTypeModel(CategoryDatasetModel):
         CategoryDatasetModel.__init__(self, session, data)
 
 
-factory.register_dataset_model(DevelopmentPolicyCategoryModel)
+factory.register_dataset_model(DocumentTypeModel)
 
 
 class LocalAuthorityDistrictModel(GeographyDatasetModel):
@@ -310,8 +316,12 @@ class DevelopmentPlanDocumentModel(DatasetModel):
             for key in Document.__table__.columns.keys()
             if key in self.data
         }
+
         if "document" not in self.document and self.dataset_name in self.data:
             self.document["document"] = self.data[self.dataset_name]
+
+        if "document_url" not in self.document and "document-url" in self.data:
+            self.document["document_url"] = self.data["document-url"]
 
         self.categories = (
             self.data["development-plan-types"].split(";")
@@ -402,6 +412,9 @@ class DocumentModel(DatasetModel):
             if key in self.data
         }
 
+        if "document_url" not in self.document and "document-url" in self.data:
+            self.document["document_url"] = self.data["document-url"]
+
         self.categories = (
             self.data["document-types"].split(";")
             if "document-types" in self.data
@@ -457,16 +470,18 @@ class DocumentModel(DatasetModel):
                 )
                 orms.append(relationship)
 
+        # Geographies in Document are referenced by slug, not by code
         for geography in self.geographies:
-            geography_orm = self.find_relation(
-                self.get_geography,
+            geography_slug = self.find_relation(
+                self.get_slug,
                 document,
-                "conservation-area:" + geography,
+                geography,
                 allow_broken_relationships,
             )
-            if geography_orm:
+
+            if geography_slug and geography_slug.geography:
                 relationship = DocumentGeography(
-                    geography=geography_orm, document=document
+                    geography=geography_slug.geography[0], document=document
                 )
                 orms.append(relationship)
 
