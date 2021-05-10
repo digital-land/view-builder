@@ -474,3 +474,4 @@ class DocumentModel(DatasetModel):
 
 
 factory.register_dataset_model(DocumentModel)
+
