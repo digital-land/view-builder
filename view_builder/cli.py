@@ -2,6 +2,7 @@ import click
 from digital_land.model.entity import Entity
 from digital_land.repository.entry_repository import EntryRepository
 from view_builder.builder import ViewBuilder
+from view_builder.index import index_view_model
 from view_builder.model.dataset import factory as dataset_model_factory
 
 from view_builder.model.table import Base
@@ -57,6 +58,15 @@ def build(debug, allow_broken_relationships, dataset_name, input_path, output_pa
 
 
 cli.add_command(build)
+
+
+@click.command("index", short_help="add indexes to view model DB")
+@click.argument("input_path", type=click.Path(exists=True))
+def index(input_path):
+    index_view_model(input_path)
+
+
+cli.add_command(index)
 
 
 # Temporary command to load organisations from organisation.csv
