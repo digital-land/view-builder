@@ -5,8 +5,10 @@ from view_builder.model.dataset import (
     LocalAuthorityDistrictModel,
     DevelopmentPolicyModel,
     DevelopmentPlanDocumentModel,
+    DocumentModel,
 )
 from view_builder.model.table import (
+    Slug,
     Organisation,
     Geography,
     OrganisationGeography,
@@ -37,6 +39,7 @@ dummy_geography = Geography(
 )
 dummy_category = Category(id=1, category="A category", name="some category")
 dummy_policy = Policy(id=1, policy="A policy", name="some policy")
+dummy_slug = Slug(id=1, slug="/a/slug/example")
 
 
 @pytest.fixture
@@ -71,6 +74,15 @@ def mock_get_policy(mocker):
     mock_db = mocker.patch(
         "view_builder.model.dataset.DatasetModel.get_policy",
         lambda self, policy: dummy_policy,
+    )
+    return mock_db
+
+
+@pytest.fixture
+def mock_get_slug(mocker):
+    mock_db = mocker.patch(
+        "view_builder.model.dataset.DatasetModel.get_slug",
+        lambda self, slug: dummy_slug,
     )
     return mock_db
 
@@ -124,6 +136,7 @@ def test_dataset_model_future_entry_date():
         DatasetModel(None, test_data)
 
 
+# Test to cover CategoryDatasetModel
 def test_development_agreement_type_model():
     test_data = {
         "developer-agreement-type": "AAA",
@@ -274,6 +287,89 @@ def test_development_plan_document_model(
     assert first_orm_obj.notes == test_data["notes"]
     assert first_orm_obj.description == test_data["description"]
     assert first_orm_obj.slug.slug == test_data["slug"]
+    assert first_orm_obj.document_url == test_data["document-url"]
+
+    assert len(first_orm_obj.categories) == 2
+    assert first_orm_obj.categories[0] == dummy_category
+    assert first_orm_obj.categories[1] == dummy_category
+
+    assert len(first_orm_obj.policies) == 2
+    assert first_orm_obj.policies[0] == dummy_policy
+    assert first_orm_obj.policies[1] == dummy_policy
+
+    assert (
+        len(
+            [
+                x
+                for x in orm_obj_list
+                if isinstance(x, DocumentOrganisation)
+                and x.document == first_orm_obj
+                and x.organisation == dummy_organisation
+            ]
+        )
+        == 1
+    )
+
+    assert (
+        len(
+            [
+                x
+                for x in orm_obj_list
+                if isinstance(x, DocumentGeography)
+                and x.document == first_orm_obj
+                and x.geography == dummy_geography
+            ]
+        )
+        == 2
+    )
+
+
+@pytest.fixture
+def mock_get_geography_slug(mocker):
+    ret = dummy_slug
+    ret.geography = [dummy_geography]
+    mock_db = mocker.patch(
+        "view_builder.model.dataset.DatasetModel.get_slug",
+        lambda self, slug: ret,
+    )
+    return mock_db
+
+
+@pytest.mark.usefixtures("mock_get_organisation")
+@pytest.mark.usefixtures("mock_get_geography_slug")
+@pytest.mark.usefixtures("mock_get_category")
+@pytest.mark.usefixtures("mock_get_policy")
+def test_document_model(
+    mock_get_organisation, mock_get_geography_slug, mock_get_category, mock_get_policy
+):
+    test_data = {
+        "document": "AAA",
+        "name": "BBB",
+        "document-types": "A;B",
+        "development-policies": "pol-a;pol-b",
+        "geographies": "/a/slug/example;/a/slug/example/b",
+        "entry-date": "2020-10-04",
+        "start-date": "2020-10-05",
+        "organisations": "local-authority-eng:CCC",
+        "document-url": "www.example.com",
+        "slug": "/document/area/CCC/AAA",
+        "notes": "ZZZ",
+        "description": "a description",
+    }
+
+    doc_orm = DocumentModel(None, test_data)
+    orm_obj_list = doc_orm.to_orm()
+
+    assert len(orm_obj_list) == 4
+
+    first_orm_obj = orm_obj_list[0]
+    assert isinstance(first_orm_obj, Document)
+    assert first_orm_obj.document == test_data["document"]
+    assert first_orm_obj.name == test_data["name"]
+    assert first_orm_obj.notes == test_data["notes"]
+    assert first_orm_obj.description == test_data["description"]
+    assert first_orm_obj.slug.slug == test_data["slug"]
+    assert first_orm_obj.document_url == test_data["document-url"]
 
     assert len(first_orm_obj.categories) == 2
     assert first_orm_obj.categories[0] == dummy_category
