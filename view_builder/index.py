@@ -1,4 +1,13 @@
 import sqlite3
+import sys
+
+is_mac_os = sys.platform == "darwin"
+
+lib = (
+    "/usr/local/lib/mod_spatialite.dylib"
+    if is_mac_os
+    else "/usr/lib/x86_64-linux-gnu/mod_spatialite.so"
+)
 
 
 def index_view_model(path):
@@ -6,7 +15,7 @@ def index_view_model(path):
 
     # Lead the spatialite extension:
     conn.enable_load_extension(True)
-    conn.load_extension("/usr/local/lib/mod_spatialite.dylib")
+    conn.load_extension(lib)
 
     # Initialize spatial metadata for this database:
     conn.execute("select InitSpatialMetadata(1)")
