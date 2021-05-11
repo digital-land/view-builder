@@ -16,9 +16,12 @@ from view_builder.model.table import (
     Policy,
     PolicyOrganisation,
     PolicyGeography,
+    PolicyDocument,
+    PolicyCategory,
     Document,
     DocumentGeography,
     DocumentOrganisation,
+    DocumentCategory,
 )
 import datetime
 import pytest
@@ -215,7 +218,7 @@ def test_development_policy_model(
     development_policy_orm = DevelopmentPolicyModel(None, test_data)
     orm_obj_list = development_policy_orm.to_orm()
 
-    assert len(orm_obj_list) == 4
+    assert len(orm_obj_list) == 6
 
     first_orm_obj = orm_obj_list[0]
     assert isinstance(first_orm_obj, Policy)
@@ -224,7 +227,19 @@ def test_development_policy_model(
     assert first_orm_obj.notes == test_data["notes"]
     assert first_orm_obj.description == test_data["description"]
     assert first_orm_obj.slug.slug == test_data["slug"]
-    assert first_orm_obj.categories[0] == dummy_category
+
+    assert (
+        len(
+            [
+                x
+                for x in orm_obj_list
+                if isinstance(x, PolicyCategory)
+                and x.category == dummy_category
+                and x.policy == first_orm_obj
+            ]
+        )
+        == 2
+    )
 
     assert (
         len(
@@ -278,7 +293,7 @@ def test_development_plan_document_model(
     development_plan_doc_orm = DevelopmentPlanDocumentModel(None, test_data)
     orm_obj_list = development_plan_doc_orm.to_orm()
 
-    assert len(orm_obj_list) == 4
+    assert len(orm_obj_list) == 8
 
     first_orm_obj = orm_obj_list[0]
     assert isinstance(first_orm_obj, Document)
@@ -289,13 +304,31 @@ def test_development_plan_document_model(
     assert first_orm_obj.slug.slug == test_data["slug"]
     assert first_orm_obj.document_url == test_data["document-url"]
 
-    assert len(first_orm_obj.categories) == 2
-    assert first_orm_obj.categories[0] == dummy_category
-    assert first_orm_obj.categories[1] == dummy_category
+    assert (
+        len(
+            [
+                x
+                for x in orm_obj_list
+                if isinstance(x, DocumentCategory)
+                and x.document == first_orm_obj
+                and x.category == dummy_category
+            ]
+        )
+        == 2
+    )
 
-    assert len(first_orm_obj.policies) == 2
-    assert first_orm_obj.policies[0] == dummy_policy
-    assert first_orm_obj.policies[1] == dummy_policy
+    assert (
+        len(
+            [
+                x
+                for x in orm_obj_list
+                if isinstance(x, PolicyDocument)
+                and x.document == first_orm_obj
+                and x.policy == dummy_policy
+            ]
+        )
+        == 2
+    )
 
     assert (
         len(
@@ -360,7 +393,7 @@ def test_document_model(
     doc_orm = DocumentModel(None, test_data)
     orm_obj_list = doc_orm.to_orm()
 
-    assert len(orm_obj_list) == 4
+    assert len(orm_obj_list) == 8
 
     first_orm_obj = orm_obj_list[0]
     assert isinstance(first_orm_obj, Document)
@@ -371,13 +404,31 @@ def test_document_model(
     assert first_orm_obj.slug.slug == test_data["slug"]
     assert first_orm_obj.document_url == test_data["document-url"]
 
-    assert len(first_orm_obj.categories) == 2
-    assert first_orm_obj.categories[0] == dummy_category
-    assert first_orm_obj.categories[1] == dummy_category
+    assert (
+        len(
+            [
+                x
+                for x in orm_obj_list
+                if isinstance(x, DocumentCategory)
+                and x.document == first_orm_obj
+                and x.category == dummy_category
+            ]
+        )
+        == 2
+    )
 
-    assert len(first_orm_obj.policies) == 2
-    assert first_orm_obj.policies[0] == dummy_policy
-    assert first_orm_obj.policies[1] == dummy_policy
+    assert (
+        len(
+            [
+                x
+                for x in orm_obj_list
+                if isinstance(x, PolicyDocument)
+                and x.document == first_orm_obj
+                and x.policy == dummy_policy
+            ]
+        )
+        == 2
+    )
 
     assert (
         len(

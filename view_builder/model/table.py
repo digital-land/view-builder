@@ -1,6 +1,5 @@
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy import (
-    Table,
     ForeignKey,
     Column,
     Integer,
@@ -29,19 +28,20 @@ class Slug(Base):
         )
 
 
-policy_category = Table(
-    "policy_category",
-    Base.metadata,
-    Column("policy", Integer, ForeignKey("policy.id")),
-    Column("category", Integer, ForeignKey("category.id")),
-)
+class PolicyCategory(Base):
+    __tablename__ = "policy_category"
+    policy_id = Column(Integer, ForeignKey("policy.id"), primary_key=True)
+    category_id = Column(Integer, ForeignKey("category.id"), primary_key=True)
+    category = relationship("Category", back_populates="policies")
+    policy = relationship("Policy", back_populates="categories")
 
-document_category = Table(
-    "document_category",
-    Base.metadata,
-    Column("category", Integer, ForeignKey("category.id")),
-    Column("document", Integer, ForeignKey("document.id")),
-)
+
+class DocumentCategory(Base):
+    __tablename__ = "document_category"
+    document_id = Column(Integer, ForeignKey("document.id"), primary_key=True)
+    category_id = Column(Integer, ForeignKey("category.id"), primary_key=True)
+    document = relationship("Document", back_populates="categories")
+    category = relationship("Category", back_populates="documents")
 
 
 class Category(Base):
@@ -59,12 +59,8 @@ class Category(Base):
     __table_args__ = (UniqueConstraint("category", "type"),)
 
     slug = relationship("Slug", back_populates="category")
-    documents = relationship(
-        "Document", secondary=document_category, back_populates="categories"
-    )
-    policies = relationship(
-        "Policy", secondary=policy_category, back_populates="categories"
-    )
+    documents = relationship("DocumentCategory", back_populates="category")
+    policies = relationship("PolicyCategory", back_populates="category")
 
     def __repr__(self):
         return "Category({})".format(
@@ -128,12 +124,12 @@ class OrganisationGeography(Base):
     organisation = relationship("Organisation", back_populates="geographies")
 
 
-policy_document = Table(
-    "policy_document",
-    Base.metadata,
-    Column("policy", Integer, ForeignKey("policy.id")),
-    Column("document", Integer, ForeignKey("document.id")),
-)
+class PolicyDocument(Base):
+    __tablename__ = "policy_document"
+    policy_id = Column(Integer, ForeignKey("policy.id"), primary_key=True)
+    document_id = Column(Integer, ForeignKey("document.id"), primary_key=True)
+    document = relationship("Document", back_populates="policies")
+    policy = relationship("Policy", back_populates="documents")
 
 
 class Policy(Base):
@@ -150,12 +146,8 @@ class Policy(Base):
     end_date = Column(Date)
 
     slug = relationship("Slug", back_populates="policy")
-    documents = relationship(
-        "Document", secondary=policy_document, back_populates="policies"
-    )
-    categories = relationship(
-        "Category", secondary=policy_category, back_populates="policies"
-    )
+    documents = relationship("PolicyDocument", back_populates="policy")
+    categories = relationship("PolicyCategory", back_populates="policy")
     geographies = relationship("PolicyGeography", back_populates="policy")
     organisations = relationship("PolicyOrganisation", back_populates="policy")
 
@@ -203,12 +195,8 @@ class Document(Base):
     end_date = Column(Date)
 
     slug = relationship("Slug", back_populates="document")
-    categories = relationship(
-        "Category", secondary=document_category, back_populates="documents"
-    )
-    policies = relationship(
-        "Policy", secondary=policy_document, back_populates="documents"
-    )
+    categories = relationship("DocumentCategory", back_populates="document")
+    policies = relationship("PolicyDocument", back_populates="document")
     geographies = relationship("DocumentGeography", back_populates="document")
     organisations = relationship("DocumentOrganisation", back_populates="document")
 

@@ -10,9 +10,12 @@ from view_builder.model.table import (
     Policy,
     PolicyGeography,
     PolicyOrganisation,
+    PolicyCategory,
+    PolicyDocument,
     Document,
     DocumentGeography,
     DocumentOrganisation,
+    DocumentCategory,
 )
 
 logging.basicConfig(level=logging.WARNING)
@@ -261,7 +264,8 @@ class DevelopmentPolicyModel(DatasetModel):
         orms = []
         slug = Slug(**self.slug)
         policy = Policy(**self.policy, slug=slug)
-        policy.categories = []
+
+        orms.append(policy)
 
         def category_callback(category):
             return self.get_category(
@@ -273,9 +277,8 @@ class DevelopmentPolicyModel(DatasetModel):
                 category_callback, policy, category, allow_broken_relationships
             )
             if category_orm:
-                policy.categories.append(category_orm)
-
-        orms.append(policy)
+                relationship = PolicyCategory(category=category_orm, policy=policy)
+                orms.append(relationship)
 
         for org in self.organisations:
             org_orm = self.find_relation(
@@ -346,8 +349,8 @@ class DevelopmentPlanDocumentModel(DatasetModel):
         orms = []
         slug = Slug(**self.slug)
         document = Document(**self.document, slug=slug)
-        document.policies = []
-        document.categories = []
+
+        orms.append(document)
 
         def category_callback(category):
             return self.get_category(category=category, type="development-plan-type")
@@ -357,16 +360,18 @@ class DevelopmentPlanDocumentModel(DatasetModel):
                 category_callback, document, category, allow_broken_relationships
             )
             if category_orm:
-                document.categories.append(category_orm)
+                relationship = DocumentCategory(
+                    document=document, category=category_orm
+                )
+                orms.append(relationship)
 
         for policy in self.policies:
             policy_orm = self.find_relation(
                 self.get_policy, document, policy, allow_broken_relationships
             )
             if policy_orm:
-                document.policies.append(policy_orm)
-
-        orms.append(document)
+                relationship = PolicyDocument(policy=policy_orm, document=document)
+                orms.append(relationship)
 
         for org in self.organisations:
             org_orm = self.find_relation(
@@ -438,8 +443,8 @@ class DocumentModel(DatasetModel):
         orms = []
         slug = Slug(**self.slug)
         document = Document(**self.document, slug=slug)
-        document.policies = []
-        document.categories = []
+
+        orms.append(document)
 
         def category_callback(category):
             return self.get_category(category=category, type="document-type")
@@ -449,16 +454,18 @@ class DocumentModel(DatasetModel):
                 category_callback, document, category, allow_broken_relationships
             )
             if category_orm:
-                document.categories.append(category_orm)
+                relationship = DocumentCategory(
+                    document=document, category=category_orm
+                )
+                orms.append(relationship)
 
         for policy in self.policies:
             policy_orm = self.find_relation(
                 self.get_policy, document, policy, allow_broken_relationships
             )
             if policy_orm:
-                document.policies.append(policy_orm)
-
-        orms.append(document)
+                relationship = PolicyDocument(policy=policy_orm, document=document)
+                orms.append(relationship)
 
         for org in self.organisations:
             org_orm = self.find_relation(
