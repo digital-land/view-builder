@@ -46,7 +46,7 @@ def index_view_model(path):
 
     # Finally drop the automatically created KNN table as it's not compatible
     # with datasette package as yet
-    conn.execute("DROP TABLE KNN")
+    conn.execute("DROP TABLE IF EXISTS KNN")
 
     # If you don't commit your changes will not be persisted:
     conn.commit()
