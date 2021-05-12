@@ -33,8 +33,20 @@ def index_view_model(path):
     """
     )
 
+    # Now copy the data back to geometry as geoJSON
+    conn.execute(
+        """
+        UPDATE geography SET
+        geometry= AsGeoJSON(geom)
+    """
+    )
+
     # Now add a spatial index to that column
     conn.execute('select CreateSpatialIndex("geography", "geom");')
+
+    # Finally drop the automatically created KNN table as it's not compatible
+    # with datasette package as yet
+    conn.execute("DROP TABLE KNN")
 
     # If you don't commit your changes will not be persisted:
     conn.commit()
