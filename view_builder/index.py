@@ -53,14 +53,14 @@ def index_view_model(path):
     conn.execute("DROP TABLE IF EXISTS KNN")
 
     # Build our row into a full geoJSON feature for quick map fetches
-    conn.execute("""DROP VIEW IF EXISTS v_geography_simplified""")
+    conn.execute("""DROP TABLE IF EXISTS v_geography_simplified""")
     conn.execute("""
-        CREATE VIEW v_geography_simplified
+        CREATE TABLE v_geography_simplified
         AS
         SELECT
             g.rowid AS rowid,
-            json_object('type', 'Feature', 'id', g.rowid, 'properties', json_object('name', name, 'type', g.type, 'slug', s.slug, 'rowid', g.rowid, 'entry-date', entry_date, 'start-date', start_date, 'end-date', end_date), 'geometry', json(AsGeoJSON(Simplify(g.geom, 0.0005)))) AS simple_features,
-            json_object('type', 'Feature', 'id', g.rowid, 'properties', json_object('name', name, 'type', g.type, 'slug', s.slug, 'rowid', g.rowid, 'entry-date', entry_date, 'start-date', start_date, 'end-date', end_date), 'geometry', json(AsGeoJSON(geom))) AS features
+            json_object('type', 'Feature', 'id', g.rowid, 'properties', json_object('name', g.name, 'type', g.type, 'slug', s.slug, 'rowid', g.rowid, 'entry-date', entry_date, 'start-date', start_date, 'end-date', end_date), 'geometry', json(AsGeoJSON(Simplify(g.geom, 0.0005)))) AS simple_features,
+            json_object('type', 'Feature', 'id', g.rowid, 'properties', json_object('name', g.name, 'type', g.type, 'slug', s.slug, 'rowid', g.rowid, 'entry-date', entry_date, 'start-date', start_date, 'end-date', end_date), 'geometry', json(AsGeoJSON(geom))) AS features
         FROM
             geography AS g
         JOIN slug AS s ON g.slug_id = s.id
