@@ -18,7 +18,7 @@ def index_view_model(path):
     conn.load_extension(lib)
 
     # Initialize spatial metadata for this database:
-    conn.execute("select InitSpatialMetadata(1)")
+    conn.execute("SELECT InitSpatialMetadata(1)")
 
     # Add a geometry column called point_geom to our museums table:
     conn.execute(
@@ -42,11 +42,28 @@ def index_view_model(path):
     )
 
     # Now add a spatial index to that column
-    conn.execute('select CreateSpatialIndex("geography", "geom");')
+    conn.execute('SELECT CreateSpatialIndex("geography", "geom");')
 
     # Finally drop the automatically created KNN table as it's not compatible
     # with datasette package as yet
     conn.execute("DROP TABLE IF EXISTS KNN")
+
+    conn.execute("""
+        CREATE VIEW v_geography_simplified
+        AS
+        SELECT
+            rowid AS rowid,
+            id,
+            slug_id,
+            AsGeoJSON(Simplify(geom, 0.0005)) AS geometry,
+            name,
+            type,
+            entry_date,
+            start_date,
+            end_date
+        FROM
+            geography
+    """)
 
     # If you don't commit your changes will not be persisted:
     conn.commit()
