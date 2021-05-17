@@ -561,9 +561,6 @@ class BrownfieldLandModel(GeographyDatasetModel):
         GeographyDatasetModel.__init__(self, session, data)
         self.geography["geography"] = data["site"]
 
-        if "geometry" not in self.geography and "point" in self.data:
-            self.geography["geometry"] = data["point"]
-
         if "documentation_url" not in self.geography and "site-plan-url" in self.data:
             self.geography["documentation_url"] = self.data["site-plan-url"]
 

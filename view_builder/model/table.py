@@ -105,6 +105,7 @@ class Geography(Base):
     slug_id = Column(Integer, ForeignKey("slug.id"))
     geography = Column(String)
     geometry = Column(String)
+    point = Column(String)
     name = Column(String)
     notes = Column(String)
     documentation_url = Column(String)
