@@ -64,6 +64,7 @@ def index_view_model(path):
         FROM
             geography AS g
         JOIN slug AS s ON g.slug_id = s.id
+        WHERE g.geom IS NOT NULL
     """)
 
     # If you don't commit your changes will not be persisted:
