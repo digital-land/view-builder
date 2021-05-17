@@ -61,6 +61,7 @@ class Category(Base):
     slug = relationship("Slug", back_populates="category")
     documents = relationship("DocumentCategory", back_populates="category")
     policies = relationship("PolicyCategory", back_populates="category")
+    geographies = relationship("GeographyCategory", back_populates="category")
 
     def __repr__(self):
         return "Category({})".format(
@@ -79,7 +80,6 @@ class Organisation(Base):
     start_date = Column(Date)
     end_date = Column(Date)
 
-    # TODO: add relationships
     geographies = relationship("OrganisationGeography", back_populates="organisation")
     policies = relationship("PolicyOrganisation", back_populates="organisation")
     documents = relationship("DocumentOrganisation", back_populates="organisation")
@@ -90,6 +90,15 @@ class Organisation(Base):
         )
 
 
+class Metric(Base):
+    __tablename__ = "metric"
+    id = Column(Integer, primary_key=True)
+    field = Column(String)
+    value = Column(String)
+
+    geography = relationship("GeographyMetric", back_populates="metric")
+
+
 class Geography(Base):
     __tablename__ = "geography"
     id = Column(Integer, primary_key=True)
@@ -97,6 +106,8 @@ class Geography(Base):
     geography = Column(String)
     geometry = Column(String)
     name = Column(String)
+    notes = Column(String)
+    documentation_url = Column(String)
     type = Column(String)
     entry_date = Column(Date)
     start_date = Column(Date)
@@ -106,6 +117,8 @@ class Geography(Base):
     organisations = relationship("OrganisationGeography", back_populates="geography")
     policies = relationship("PolicyGeography", back_populates="geography")
     documents = relationship("DocumentGeography", back_populates="geography")
+    metrics = relationship("GeographyMetric", back_populates="geography")
+    categories = relationship("GeographyCategory", back_populates="geography")
 
     def __repr__(self):
         return "Geography({})".format(
@@ -122,6 +135,22 @@ class OrganisationGeography(Base):
     end_date = Column(Date)
     geography = relationship("Geography", back_populates="organisations")
     organisation = relationship("Organisation", back_populates="geographies")
+
+
+class GeographyCategory(Base):
+    __tablename__ = "geography_category"
+    category_id = Column(Integer, ForeignKey("category.id"), primary_key=True)
+    geography_id = Column(Integer, ForeignKey("geography.id"), primary_key=True)
+    geography = relationship("Geography", back_populates="categories")
+    category = relationship("Category", back_populates="geographies")
+
+
+class GeographyMetric(Base):
+    __tablename__ = "geography_metric"
+    metric_id = Column(Integer, ForeignKey("metric.id"), primary_key=True)
+    geography_id = Column(Integer, ForeignKey("geography.id"), primary_key=True)
+    geography = relationship("Geography", back_populates="metrics")
+    metric = relationship("Metric", back_populates="geography")
 
 
 class PolicyDocument(Base):

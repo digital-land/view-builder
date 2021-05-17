@@ -6,6 +6,8 @@ from view_builder.model.table import (
     Category,
     Organisation,
     Geography,
+    GeographyCategory,
+    GeographyMetric,
     OrganisationGeography,
     Policy,
     PolicyGeography,
@@ -16,6 +18,7 @@ from view_builder.model.table import (
     DocumentGeography,
     DocumentOrganisation,
     DocumentCategory,
+    Metric,
 )
 
 logging.basicConfig(level=logging.WARNING)
@@ -206,6 +209,50 @@ class DocumentTypeModel(CategoryDatasetModel):
 
 
 factory.register_dataset_model(DocumentTypeModel)
+
+
+class OwnershipStatusModel(CategoryDatasetModel):
+
+    dataset_name = "ownership-status"
+
+    def __init__(self, session, data: dict):
+        CategoryDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(OwnershipStatusModel)
+
+
+class SiteCategoryModel(CategoryDatasetModel):
+
+    dataset_name = "site-category"
+
+    def __init__(self, session, data: dict):
+        CategoryDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(SiteCategoryModel)
+
+
+class PlanningPermissionStatusModel(CategoryDatasetModel):
+
+    dataset_name = "planning-permission-status"
+
+    def __init__(self, session, data: dict):
+        CategoryDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(PlanningPermissionStatusModel)
+
+
+class PlanningPermissionTypeModel(CategoryDatasetModel):
+
+    dataset_name = "planning-permission-type"
+
+    def __init__(self, session, data: dict):
+        CategoryDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(PlanningPermissionTypeModel)
 
 
 class LocalAuthorityDistrictModel(GeographyDatasetModel):
@@ -496,3 +543,92 @@ class DocumentModel(DatasetModel):
 
 
 factory.register_dataset_model(DocumentModel)
+
+
+class BrownfieldLandModel(GeographyDatasetModel):
+    dataset_name = "brownfield-land"
+    site_category_options = ["deliverable", "hazardous-substances"]
+    metric_fields = [
+        "maximum-net-dwellings",
+        "minimum-net-dwellings",
+        "planning-permission-date",
+        "planning-permission-history",
+        "hectares",
+        "site-address",
+    ]
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+        self.geography["geography"] = data["site"]
+
+        if "geometry" not in self.geography and "point" in self.data:
+            self.geography["geometry"] = data["point"]
+
+        if "documentation_url" not in self.geography and "site-plan-url" in self.data:
+            self.geography["documentation_url"] = self.data["site-plan-url"]
+
+        self.categories = []
+
+        if "ownership-status" in self.data:
+            self.categories.extend(
+                ("ownership-status", ownership_status.replace(" ", "-").lower())
+                for ownership_status in self.data["ownership-status"].split(";")
+            )
+
+        if "planning-permission-type" in self.data:
+            self.categories.extend(
+                ("planning-permission-type", permission_type.replace(" ", "-").lower())
+                for permission_type in self.data["planning-permission-type"].split(";")
+            )
+
+        if "planning-permission-status" in self.data:
+            self.categories.extend(
+                (
+                    "planning-permission-status",
+                    permission_status.replace(" ", "-").lower(),
+                )
+                for permission_status in self.data["planning-permission-status"].split(
+                    ";"
+                )
+            )
+
+        self.categories.extend(
+            ("site-category", site_category)
+            for site_category in self.site_category_options
+            if site_category in self.data
+        )
+
+        self.metrics = (
+            (metric_field, self.data[metric_field])
+            for metric_field in self.metric_fields
+            if metric_field in self.data and self.data[metric_field]
+        )
+
+        # TODO site-address
+
+    def to_orm(self, allow_broken_relationships=False):
+        orms = super().to_orm(allow_broken_relationships)
+        geography = orms[0]
+
+        for (category_type, category) in self.categories:
+            category_orm = self.find_relation(
+                lambda cat: self.get_category(category=cat, type=category_type),
+                geography,
+                category,
+                allow_broken_relationships,
+            )
+            if category_orm:
+                relationship = GeographyCategory(
+                    geography=geography, category=category_orm
+                )
+                orms.append(relationship)
+
+        for (metric, value) in self.metrics:
+            metric_orm = Metric(field=metric, value=value)
+            relationship = GeographyMetric(geography=geography, metric=metric_orm)
+            orms.append(relationship)
+
+        return orms
+
+
+factory.register_dataset_model(BrownfieldLandModel)
