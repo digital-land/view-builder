@@ -64,7 +64,7 @@ def index_view_model(path):
         FROM
             geography AS g
         JOIN slug AS s ON g.slug_id = s.id
-        WHERE g.geom IS NOT NULL
+        WHERE json_valid(AsGeoJSON(g.geom)) = 1
     """)
 
     # If you don't commit your changes will not be persisted:
