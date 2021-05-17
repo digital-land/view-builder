@@ -59,8 +59,8 @@ def index_view_model(path):
         AS
         SELECT
             g.rowid AS rowid,
-            json_object('type', 'Feature', 'id', g.rowid, 'properties', json_object('name', name, 'type', g.type, 'slug', s.slug, 'rowid', g.rowid, 'entry-date', entry_date, 'start-date', start_date, 'end-date', end_date), 'geometry', AsGeoJSON(Simplify(g.geom, 0.0005))) AS simple_features,
-            json_object('type', 'Feature', 'id', g.rowid, 'properties', json_object('name', name, 'type', g.type, 'slug', s.slug, 'rowid', g.rowid, 'entry-date', entry_date, 'start-date', start_date, 'end-date', end_date), "geometry", AsGeoJSON(geom)) AS features
+            json_object('type', 'Feature', 'id', g.rowid, 'properties', json_object('name', name, 'type', g.type, 'slug', s.slug, 'rowid', g.rowid, 'entry-date', entry_date, 'start-date', start_date, 'end-date', end_date), 'geometry', json(AsGeoJSON(Simplify(g.geom, 0.0005)))) AS simple_features,
+            json_object('type', 'Feature', 'id', g.rowid, 'properties', json_object('name', name, 'type', g.type, 'slug', s.slug, 'rowid', g.rowid, 'entry-date', entry_date, 'start-date', start_date, 'end-date', end_date), 'geometry', json(AsGeoJSON(geom))) AS features
         FROM
             geography AS g
         JOIN slug AS s ON g.slug_id = s.id
