@@ -25,6 +25,10 @@ def index_view_model(path):
         "SELECT AddGeometryColumn('geography', 'geom', 4326, 'MULTIPOLYGON', 2);"
     )
 
+    # TODO: Lets think more about the layout of our view model. We should probably
+    #       keep the geography table untouched and create views that have the geoJSON
+    #       pre-baked for various zoom levels.
+
     # Now update that geometry column with the lat/lon points
     conn.execute(
         """
@@ -48,21 +52,18 @@ def index_view_model(path):
     # with datasette package as yet
     conn.execute("DROP TABLE IF EXISTS KNN")
 
+    # Build our row into a full geoJSON feature for quick map fetches
+    conn.execute("""DROP VIEW IF EXISTS v_geography_simplified""")
     conn.execute("""
         CREATE VIEW v_geography_simplified
         AS
         SELECT
-            rowid AS rowid,
-            id,
-            slug_id,
-            AsGeoJSON(Simplify(geom, 0.0005)) AS geometry,
-            name,
-            type,
-            entry_date,
-            start_date,
-            end_date
+            g.rowid AS rowid,
+            json_object('type', 'Feature', 'id', g.rowid, 'properties', json_object('name', name, 'type', g.type, 'slug', s.slug, 'rowid', g.rowid, 'entry-date', entry_date, 'start-date', start_date, 'end-date', end_date), 'geometry', AsGeoJSON(Simplify(g.geom, 0.0005))) AS simple_features,
+            json_object('type', 'Feature', 'id', g.rowid, 'properties', json_object('name', name, 'type', g.type, 'slug', s.slug, 'rowid', g.rowid, 'entry-date', entry_date, 'start-date', start_date, 'end-date', end_date), "geometry", AsGeoJSON(geom)) AS features
         FROM
-            geography
+            geography AS g
+        JOIN slug AS s ON g.slug_id = s.id
     """)
 
     # If you don't commit your changes will not be persisted:
