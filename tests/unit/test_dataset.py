@@ -2,15 +2,18 @@ from view_builder.model.dataset import (
     DatasetModel,
     DatasetModelFactory,
     DeveloperAgreementTypeModel,
-    LocalAuthorityDistrictModel,
+    GeographyDatasetModel,
     DevelopmentPolicyModel,
     DevelopmentPlanDocumentModel,
     DocumentModel,
+    BrownfieldLandModel,
 )
 from view_builder.model.table import (
     Slug,
     Organisation,
     Geography,
+    GeographyMetric,
+    GeographyCategory,
     OrganisationGeography,
     Category,
     Policy,
@@ -161,7 +164,7 @@ def test_development_agreement_type_model():
     assert orm_obj.slug.slug == test_data["slug"]
 
 
-def test_local_authority_district_model(mocker):
+def test_geography_dataset_model(mocker):
     test_data = {
         "name": "BBB",
         "geography": "local-authority-district:AAA",
@@ -176,11 +179,11 @@ def test_local_authority_district_model(mocker):
         id=1, organisation="government-organisation:CCC", name="some organisation"
     )
     mocker.patch(
-        "view_builder.model.dataset.LocalAuthorityDistrictModel.get_organisation",
+        "view_builder.model.dataset.GeographyDatasetModel.get_organisation",
         lambda self, org: test_organisation,
     )
-    local_authority_district_orm = LocalAuthorityDistrictModel(None, test_data)
-    orm_obj_list = local_authority_district_orm.to_orm()
+    geography_model = GeographyDatasetModel(None, test_data)
+    orm_obj_list = geography_model.to_orm()
 
     assert len(orm_obj_list) == 2
     first_orm_obj = orm_obj_list[0]
@@ -455,3 +458,60 @@ def test_document_model(
         )
         == 2
     )
+
+
+@pytest.mark.usefixtures("mock_get_organisation")
+def test_brownfield_land_model(mocker, mock_get_organisation):
+    test_data = {
+        "name": "BBB",
+        "site": "a site",
+        "point": "POINT (((-1.111111 2.222222)))",
+        "planning-permission-type": "Full planning Permission",
+        "planning-permission-status": "not permissioned",
+        "ownership-status": "owned by a public authority",
+        "deliverable": "yes",
+        "hazardous-substances": "yes",
+        "maximum-net-dwellings": "4",
+        "minimum-net-dwellings": "5",
+        "planning-permission-date": "2016-07-13",
+        "planning-permission-history": "www.example.com",
+        "hectares": "7",
+        "site-address": "an address",
+        "entry-date": "2020-10-04",
+        "start-date": "2020-10-05",
+        "organisation": "government-organisation:CCC",
+        "slug": "/brownfield-land/development-corporation/AAA",
+        "extra_field": "ZZZ",
+    }
+
+    test_categories = set()
+    test_metrics = set()
+    for field in BrownfieldLandModel.category_fields:
+        test_categories.add(test_data[field].replace(" ", "-").lower())
+
+    for field in BrownfieldLandModel.site_category_fields:
+        test_categories.add(field)
+
+    for metric in BrownfieldLandModel.metric_fields:
+        print(test_data[metric])
+        test_metrics.add(str(test_data[metric]))
+
+    mocker.patch(
+        "view_builder.model.dataset.BrownfieldLandModel.get_category",
+        lambda self, category, type: Category(id=1, category=category, name=category),
+    )
+
+    brownfield_orm = BrownfieldLandModel(None, test_data)
+    orm_obj_list = brownfield_orm.to_orm()
+    first_orm_obj = orm_obj_list[0]
+    assert isinstance(first_orm_obj, Geography)
+
+    for orm_obj in orm_obj_list:
+        if isinstance(orm_obj, GeographyCategory):
+            assert orm_obj.category.category in test_categories
+            test_categories.remove(orm_obj.category.category)
+
+    for orm_obj in orm_obj_list:
+        if isinstance(orm_obj, GeographyMetric):
+            assert orm_obj.metric.value in test_metrics
+            test_metrics.remove(orm_obj.metric.value)

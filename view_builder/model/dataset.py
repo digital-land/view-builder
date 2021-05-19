@@ -133,6 +133,9 @@ class CategoryDatasetModel(DatasetModel):
 
 
 class GeographyDatasetModel(DatasetModel):
+
+    dataset_name = None
+
     def __init__(self, session, data: dict):
         DatasetModel.__init__(self, session, data)
         self.slug = {
@@ -547,7 +550,12 @@ factory.register_dataset_model(DocumentModel)
 
 class BrownfieldLandModel(GeographyDatasetModel):
     dataset_name = "brownfield-land"
-    site_category_options = ["deliverable", "hazardous-substances"]
+    site_category_fields = ["deliverable", "hazardous-substances"]
+    category_fields = [
+        "ownership-status",
+        "planning-permission-type",
+        "planning-permission-status",
+    ]
     metric_fields = [
         "maximum-net-dwellings",
         "minimum-net-dwellings",
@@ -566,32 +574,16 @@ class BrownfieldLandModel(GeographyDatasetModel):
 
         self.categories = []
 
-        if "ownership-status" in self.data:
-            self.categories.extend(
-                ("ownership-status", ownership_status.replace(" ", "-").lower())
-                for ownership_status in self.data["ownership-status"].split(";")
-            )
-
-        if "planning-permission-type" in self.data:
-            self.categories.extend(
-                ("planning-permission-type", permission_type.replace(" ", "-").lower())
-                for permission_type in self.data["planning-permission-type"].split(";")
-            )
-
-        if "planning-permission-status" in self.data:
-            self.categories.extend(
-                (
-                    "planning-permission-status",
-                    permission_status.replace(" ", "-").lower(),
+        for category_field in self.category_fields:
+            if category_field in self.data:
+                self.categories.extend(
+                    (category_field, category.replace(" ", "-").lower())
+                    for category in self.data[category_field].split(";")
                 )
-                for permission_status in self.data["planning-permission-status"].split(
-                    ";"
-                )
-            )
 
         self.categories.extend(
             ("site-category", site_category)
-            for site_category in self.site_category_options
+            for site_category in self.site_category_fields
             if site_category in self.data
         )
 
