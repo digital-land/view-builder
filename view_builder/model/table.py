@@ -15,7 +15,7 @@ class Slug(Base):
     __tablename__ = "slug"
     id = Column(Integer, primary_key=True)
     prefix = Column(String)
-    slug = Column(String, unique=True)
+    slug = Column(String, index=True, unique=True)
 
     category = relationship("Category", back_populates="slug")
     geography = relationship("Geography", back_populates="slug")
@@ -48,7 +48,7 @@ class Category(Base):
     __tablename__ = "category"
     id = Column(Integer, primary_key=True)
     slug_id = Column(Integer, ForeignKey("slug.id"))
-    category = Column(String)
+    category = Column(String, index=True)
     type = Column(String)
     reference = Column(String)
     name = Column(String)
@@ -73,7 +73,7 @@ class Organisation(Base):
     __tablename__ = "organisation"
     id = Column(Integer, primary_key=True)
     prefix = Column(String)
-    organisation = Column(String, unique=True)
+    organisation = Column(String, index=True, unique=True)
     reference = Column(String)
     name = Column(String)
     entry_date = Column(Date)
@@ -103,7 +103,7 @@ class Geography(Base):
     __tablename__ = "geography"
     id = Column(Integer, primary_key=True)
     slug_id = Column(Integer, ForeignKey("slug.id"))
-    geography = Column(String)
+    geography = Column(String, index=True)
     geometry = Column(String)
     point = Column(String)
     name = Column(String)
@@ -166,7 +166,7 @@ class Policy(Base):
     __tablename__ = "policy"
     id = Column(Integer, primary_key=True)
     slug_id = Column(Integer, ForeignKey("slug.id"))
-    policy = Column(String, unique=True)
+    policy = Column(String, index=True, unique=True)
     reference = Column(String)
     name = Column(String)
     description = Column(String)
@@ -214,7 +214,7 @@ class Document(Base):
     id = Column(Integer, primary_key=True)
     slug_id = Column(Integer, ForeignKey("slug.id"))
     prefix = Column(String)
-    document = Column(String)
+    document = Column(String, index=True)
     reference = Column(String)
     name = Column(String)
     description = Column(String)
