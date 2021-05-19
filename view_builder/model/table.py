@@ -30,16 +30,22 @@ class Slug(Base):
 
 class PolicyCategory(Base):
     __tablename__ = "policy_category"
-    policy_id = Column(Integer, ForeignKey("policy.id"), primary_key=True)
-    category_id = Column(Integer, ForeignKey("category.id"), primary_key=True)
+    policy_id = Column(Integer, ForeignKey("policy.id"), primary_key=True, index=True)
+    category_id = Column(
+        Integer, ForeignKey("category.id"), primary_key=True, index=True
+    )
     category = relationship("Category", back_populates="policies")
     policy = relationship("Policy", back_populates="categories")
 
 
 class DocumentCategory(Base):
     __tablename__ = "document_category"
-    document_id = Column(Integer, ForeignKey("document.id"), primary_key=True)
-    category_id = Column(Integer, ForeignKey("category.id"), primary_key=True)
+    document_id = Column(
+        Integer, ForeignKey("document.id"), primary_key=True, index=True
+    )
+    category_id = Column(
+        Integer, ForeignKey("category.id"), primary_key=True, index=True
+    )
     document = relationship("Document", back_populates="categories")
     category = relationship("Category", back_populates="documents")
 
@@ -129,8 +135,12 @@ class Geography(Base):
 
 class OrganisationGeography(Base):
     __tablename__ = "organisation_geography"
-    organisation_id = Column(Integer, ForeignKey("organisation.id"), primary_key=True)
-    geography_id = Column(Integer, ForeignKey("geography.id"), primary_key=True)
+    organisation_id = Column(
+        Integer, ForeignKey("organisation.id"), primary_key=True, index=True
+    )
+    geography_id = Column(
+        Integer, ForeignKey("geography.id"), primary_key=True, index=True
+    )
     entry_date = Column(Date)
     start_date = Column(Date)
     end_date = Column(Date)
@@ -140,24 +150,32 @@ class OrganisationGeography(Base):
 
 class GeographyCategory(Base):
     __tablename__ = "geography_category"
-    category_id = Column(Integer, ForeignKey("category.id"), primary_key=True)
-    geography_id = Column(Integer, ForeignKey("geography.id"), primary_key=True)
+    category_id = Column(
+        Integer, ForeignKey("category.id"), primary_key=True, index=True
+    )
+    geography_id = Column(
+        Integer, ForeignKey("geography.id"), primary_key=True, index=True
+    )
     geography = relationship("Geography", back_populates="categories")
     category = relationship("Category", back_populates="geographies")
 
 
 class GeographyMetric(Base):
     __tablename__ = "geography_metric"
-    metric_id = Column(Integer, ForeignKey("metric.id"), primary_key=True)
-    geography_id = Column(Integer, ForeignKey("geography.id"), primary_key=True)
+    metric_id = Column(Integer, ForeignKey("metric.id"), primary_key=True, index=True)
+    geography_id = Column(
+        Integer, ForeignKey("geography.id"), primary_key=True, index=True
+    )
     geography = relationship("Geography", back_populates="metrics")
     metric = relationship("Metric", back_populates="geography")
 
 
 class PolicyDocument(Base):
     __tablename__ = "policy_document"
-    policy_id = Column(Integer, ForeignKey("policy.id"), primary_key=True)
-    document_id = Column(Integer, ForeignKey("document.id"), primary_key=True)
+    policy_id = Column(Integer, ForeignKey("policy.id"), primary_key=True, index=True)
+    document_id = Column(
+        Integer, ForeignKey("document.id"), primary_key=True, index=True
+    )
     document = relationship("Document", back_populates="policies")
     policy = relationship("Policy", back_populates="documents")
 
@@ -189,8 +207,10 @@ class Policy(Base):
 
 class PolicyGeography(Base):
     __tablename__ = "policy_geography"
-    policy_id = Column(Integer, ForeignKey("policy.id"), primary_key=True)
-    geography_id = Column(Integer, ForeignKey("geography.id"), primary_key=True)
+    policy_id = Column(Integer, ForeignKey("policy.id"), primary_key=True, index=True)
+    geography_id = Column(
+        Integer, ForeignKey("geography.id"), primary_key=True, index=True
+    )
     entry_date = Column(Date)
     start_date = Column(Date)
     end_date = Column(Date)
@@ -200,8 +220,10 @@ class PolicyGeography(Base):
 
 class PolicyOrganisation(Base):
     __tablename__ = "policy_organisation"
-    policy_id = Column(Integer, ForeignKey("policy.id"), primary_key=True)
-    organisation_id = Column(Integer, ForeignKey("organisation.id"), primary_key=True)
+    policy_id = Column(Integer, ForeignKey("policy.id"), primary_key=True, index=True)
+    organisation_id = Column(
+        Integer, ForeignKey("organisation.id"), primary_key=True, index=True
+    )
     entry_date = Column(Date)
     start_date = Column(Date)
     end_date = Column(Date)
@@ -238,8 +260,12 @@ class Document(Base):
 
 class DocumentGeography(Base):
     __tablename__ = "document_geography"
-    document_id = Column(Integer, ForeignKey("document.id"), primary_key=True)
-    geography_id = Column(Integer, ForeignKey("geography.id"), primary_key=True)
+    document_id = Column(
+        Integer, ForeignKey("document.id"), primary_key=True, index=True
+    )
+    geography_id = Column(
+        Integer, ForeignKey("geography.id"), primary_key=True, index=True
+    )
     entry_date = Column(Date)
     start_date = Column(Date)
     end_date = Column(Date)
@@ -249,8 +275,12 @@ class DocumentGeography(Base):
 
 class DocumentOrganisation(Base):
     __tablename__ = "document_organisation"
-    document_id = Column(Integer, ForeignKey("document.id"), primary_key=True)
-    organisation_id = Column(Integer, ForeignKey("organisation.id"), primary_key=True)
+    document_id = Column(
+        Integer, ForeignKey("document.id"), primary_key=True, index=True
+    )
+    organisation_id = Column(
+        Integer, ForeignKey("organisation.id"), primary_key=True, index=True
+    )
     entry_date = Column(Date)
     start_date = Column(Date)
     end_date = Column(Date)
