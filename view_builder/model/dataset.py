@@ -154,18 +154,19 @@ class GeographyDatasetModel(DatasetModel):
         geography = Geography(**self.geography, slug=slug)
         orms.append(geography)
 
-        organisation = self.find_relation(
-            self.get_organisation,
-            geography,
-            self.data["organisation"],
-            allow_broken_relationships,
-        )
-
-        if organisation:
-            relationship = OrganisationGeography(
-                organisation=organisation, geography=geography
+        if "organisation" in self.data and self.data["organisation"]:
+            organisation = self.find_relation(
+                self.get_organisation,
+                geography,
+                self.data["organisation"],
+                allow_broken_relationships,
             )
-            orms.append(relationship)
+
+            if organisation:
+                relationship = OrganisationGeography(
+                    organisation=organisation, geography=geography
+                )
+                orms.append(relationship)
 
         return orms
 
@@ -621,3 +622,13 @@ class BrownfieldLandModel(GeographyDatasetModel):
 
 
 factory.register_dataset_model(BrownfieldLandModel)
+
+
+class HeritageCoastModel(GeographyDatasetModel):
+    dataset_name = "heritage-coast"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(HeritageCoastModel)
