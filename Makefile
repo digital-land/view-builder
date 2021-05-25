@@ -25,6 +25,7 @@ $(VIEW_MODEL_DB):
 build: $(CACHE_DIR)organisation.csv $(VIEW_MODEL_DB)
 	view_builder load_organisations $(VIEW_MODEL_DB)
 	view_builder build heritage-coast data/heritage-coast.sqlite3 $(VIEW_MODEL_DB)
+	view_builder build area-of-outstanding-natural-beauty data/area-of-outstanding-natural-beauty.sqlite3 $(VIEW_MODEL_DB)
 	view_builder build local-authority-district data/local-authority-district.sqlite3 $(VIEW_MODEL_DB)
 	view_builder build conservation-area data/conservation-area.sqlite3 $(VIEW_MODEL_DB)
 	view_builder build development-policy-category data/development-policy-category.sqlite3 $(VIEW_MODEL_DB)

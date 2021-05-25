@@ -632,3 +632,13 @@ class HeritageCoastModel(GeographyDatasetModel):
 
 
 factory.register_dataset_model(HeritageCoastModel)
+
+
+class AreaOfOutstandingNaturalBeautyModel(GeographyDatasetModel):
+    dataset_name = "area-of-outstanding-natural-beauty"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(AreaOfOutstandingNaturalBeautyModel)
