@@ -13,6 +13,7 @@ Base = declarative_base()
 
 class Slug(Base):
     __tablename__ = "slug"
+    dl_type = None
     id = Column(Integer, primary_key=True)
     prefix = Column(String)
     slug = Column(String, index=True, unique=True)
@@ -30,6 +31,7 @@ class Slug(Base):
 
 class PolicyCategory(Base):
     __tablename__ = "policy_category"
+    dl_type = "join"
     policy_id = Column(Integer, ForeignKey("policy.id"), primary_key=True, index=True)
     category_id = Column(
         Integer, ForeignKey("category.id"), primary_key=True, index=True
@@ -40,6 +42,7 @@ class PolicyCategory(Base):
 
 class DocumentCategory(Base):
     __tablename__ = "document_category"
+    dl_type = "join"
     document_id = Column(
         Integer, ForeignKey("document.id"), primary_key=True, index=True
     )
@@ -52,6 +55,7 @@ class DocumentCategory(Base):
 
 class Category(Base):
     __tablename__ = "category"
+    dl_type = "schema"
     id = Column(Integer, primary_key=True)
     slug_id = Column(Integer, ForeignKey("slug.id"))
     category = Column(String, index=True)
@@ -77,6 +81,7 @@ class Category(Base):
 
 class Organisation(Base):
     __tablename__ = "organisation"
+    dl_type = "schema"
     id = Column(Integer, primary_key=True)
     prefix = Column(String)
     organisation = Column(String, index=True, unique=True)
@@ -98,6 +103,7 @@ class Organisation(Base):
 
 class Metric(Base):
     __tablename__ = "metric"
+    dl_type = None
     id = Column(Integer, primary_key=True)
     field = Column(String)
     value = Column(String)
@@ -107,6 +113,7 @@ class Metric(Base):
 
 class Geography(Base):
     __tablename__ = "geography"
+    dl_type = "schema"
     id = Column(Integer, primary_key=True)
     slug_id = Column(Integer, ForeignKey("slug.id"))
     geography = Column(String, index=True)
@@ -135,6 +142,7 @@ class Geography(Base):
 
 class OrganisationGeography(Base):
     __tablename__ = "organisation_geography"
+    dl_type = "join"
     organisation_id = Column(
         Integer, ForeignKey("organisation.id"), primary_key=True, index=True
     )
@@ -150,6 +158,7 @@ class OrganisationGeography(Base):
 
 class GeographyCategory(Base):
     __tablename__ = "geography_category"
+    dl_type = "join"
     category_id = Column(
         Integer, ForeignKey("category.id"), primary_key=True, index=True
     )
@@ -162,6 +171,7 @@ class GeographyCategory(Base):
 
 class GeographyMetric(Base):
     __tablename__ = "geography_metric"
+    dl_type = "join"
     metric_id = Column(Integer, ForeignKey("metric.id"), primary_key=True, index=True)
     geography_id = Column(
         Integer, ForeignKey("geography.id"), primary_key=True, index=True
@@ -172,6 +182,7 @@ class GeographyMetric(Base):
 
 class PolicyDocument(Base):
     __tablename__ = "policy_document"
+    dl_type = "join"
     policy_id = Column(Integer, ForeignKey("policy.id"), primary_key=True, index=True)
     document_id = Column(
         Integer, ForeignKey("document.id"), primary_key=True, index=True
@@ -182,6 +193,7 @@ class PolicyDocument(Base):
 
 class Policy(Base):
     __tablename__ = "policy"
+    dl_type = "schema"
     id = Column(Integer, primary_key=True)
     slug_id = Column(Integer, ForeignKey("slug.id"))
     policy = Column(String, index=True, unique=True)
@@ -207,6 +219,7 @@ class Policy(Base):
 
 class PolicyGeography(Base):
     __tablename__ = "policy_geography"
+    dl_type = "join"
     policy_id = Column(Integer, ForeignKey("policy.id"), primary_key=True, index=True)
     geography_id = Column(
         Integer, ForeignKey("geography.id"), primary_key=True, index=True
@@ -220,6 +233,7 @@ class PolicyGeography(Base):
 
 class PolicyOrganisation(Base):
     __tablename__ = "policy_organisation"
+    dl_type = "join"
     policy_id = Column(Integer, ForeignKey("policy.id"), primary_key=True, index=True)
     organisation_id = Column(
         Integer, ForeignKey("organisation.id"), primary_key=True, index=True
@@ -233,6 +247,7 @@ class PolicyOrganisation(Base):
 
 class Document(Base):
     __tablename__ = "document"
+    dl_type = "schema"
     id = Column(Integer, primary_key=True)
     slug_id = Column(Integer, ForeignKey("slug.id"))
     prefix = Column(String)
@@ -260,6 +275,7 @@ class Document(Base):
 
 class DocumentGeography(Base):
     __tablename__ = "document_geography"
+    dl_type = "join"
     document_id = Column(
         Integer, ForeignKey("document.id"), primary_key=True, index=True
     )
@@ -275,6 +291,7 @@ class DocumentGeography(Base):
 
 class DocumentOrganisation(Base):
     __tablename__ = "document_organisation"
+    dl_type = "join"
     document_id = Column(
         Integer, ForeignKey("document.id"), primary_key=True, index=True
     )
