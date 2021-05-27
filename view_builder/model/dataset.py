@@ -642,3 +642,13 @@ class AreaOfOutstandingNaturalBeautyModel(GeographyDatasetModel):
 
 
 factory.register_dataset_model(AreaOfOutstandingNaturalBeautyModel)
+
+
+class AncientWoodlandModel(GeographyDatasetModel):
+    dataset_name = "ancient-woodland"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(AncientWoodlandModel)
