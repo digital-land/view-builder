@@ -652,3 +652,13 @@ class AncientWoodlandModel(GeographyDatasetModel):
 
 
 factory.register_dataset_model(AncientWoodlandModel)
+
+
+class ParishModel(GeographyDatasetModel):
+    dataset_name = "parish"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(ParishModel)
