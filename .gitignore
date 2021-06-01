@@ -18,3 +18,6 @@ var/
 
 # ignore updated specification files
 specification/
+
+# don't checkin the target
+view_model.db
