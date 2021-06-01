@@ -662,3 +662,113 @@ class ParishModel(GeographyDatasetModel):
 
 
 factory.register_dataset_model(ParishModel)
+
+
+class BattlefieldModel(GeographyDatasetModel):
+    dataset_name = "battlefield"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(BattlefieldModel)
+
+
+class BuildingPreservationNoticeModel(GeographyDatasetModel):
+    dataset_name = "building-preservation-notice"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(BuildingPreservationNoticeModel)
+
+
+class ParkAndGardenModel(GeographyDatasetModel):
+    dataset_name = "park-and-garden"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(ParkAndGardenModel)
+
+
+class HeritateAtRiskModel(GeographyDatasetModel):
+    dataset_name = "heritate-at-risk"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(HeritateAtRiskModel)
+
+
+class ScheduledMonumentModel(GeographyDatasetModel):
+    dataset_name = "scheduled-monument"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(ScheduledMonumentModel)
+
+
+class WorldHeritageSiteModel(GeographyDatasetModel):
+    dataset_name = "world-heritage-site"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(WorldHeritageSiteModel)
+
+
+class ProtectedWreckSiteModel(GeographyDatasetModel):
+    dataset_name = "protected-wreck-site"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(ProtectedWreckSiteModel)
+
+
+class BuildingPreservationNoticeModel(GeographyDatasetModel):
+    dataset_name = "building-preservation-notice"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(BuildingPreservationNoticeModel)
+
+
+class CertificateOfImmunityModel(GeographyDatasetModel):
+    dataset_name = "certificate-of-immunity"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(CertificateOfImmunityModel)
+
+
+class ListedBuildingModel(GeographyDatasetModel):
+    dataset_name = "listed-building"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(ListedBuildingModel)
+
+
+class SpecialAreaOfConservationModel(GeographyDatasetModel):
+    dataset_name = "special-area-of-conservation"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(SpecialAreaOfConservationModel)
