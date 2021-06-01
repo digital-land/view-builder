@@ -5,3 +5,4 @@ click
 black
 flake8
 SQLAlchemy
+datasette
