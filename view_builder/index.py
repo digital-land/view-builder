@@ -54,7 +54,8 @@ def index_view_model(path):
 
     # Build our row into a full geoJSON feature for quick map fetches
     conn.execute("""DROP TABLE IF EXISTS v_geography_simplified""")
-    conn.execute("""
+    conn.execute(
+        """
         CREATE TABLE v_geography_simplified
         AS
         SELECT
@@ -65,7 +66,8 @@ def index_view_model(path):
             geography AS g
         JOIN slug AS s ON g.slug_id = s.id
         WHERE json_valid(AsGeoJSON(g.geom)) = 1
-    """)
+    """
+    )
 
     # If you don't commit your changes will not be persisted:
     conn.commit()
