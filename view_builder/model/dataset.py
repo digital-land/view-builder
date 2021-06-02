@@ -102,7 +102,7 @@ class DatasetModel:
                 from_item.slug.slug, to_item
             )
             if allow_broken:
-                logger.warning(message)
+                logger.debug(message)
                 orm = None
             else:
                 raise RelationshipError(message)
