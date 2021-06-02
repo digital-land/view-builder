@@ -674,6 +674,16 @@ class BattlefieldModel(GeographyDatasetModel):
 factory.register_dataset_model(BattlefieldModel)
 
 
+class HeritageAtRiskModel(GeographyDatasetModel):
+    dataset_name = "heritage-at-risk"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(HeritageAtRiskModel)
+
+
 class BuildingPreservationNoticeModel(GeographyDatasetModel):
     dataset_name = "building-preservation-notice"
 
@@ -772,3 +782,13 @@ class SpecialAreaOfConservationModel(GeographyDatasetModel):
 
 
 factory.register_dataset_model(SpecialAreaOfConservationModel)
+
+
+class GreenBeltModel(GeographyDatasetModel):
+    dataset_name = "green-belt"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(GreenBeltModel)
