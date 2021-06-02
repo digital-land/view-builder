@@ -6,16 +6,24 @@ VIEW_MODEL_DB := view_model.db
 all:: build
 
 DATASETS=\
+	$(CACHE_DIR)document-type.sqlite3\
+	$(CACHE_DIR)development-plan-type.sqlite3\
+	$(CACHE_DIR)development-policy-category.sqlite3\
+	$(CACHE_DIR)development-policy.sqlite3\
+	$(CACHE_DIR)planning-permission-status.sqlite3\
+	$(CACHE_DIR)planning-permission-type.sqlite3\
+	$(CACHE_DIR)ownership-status.sqlite3\
+	$(CACHE_DIR)site-category.sqlite3\
+	\
+	$(CACHE_DIR)local-authority-district.sqlite3\
+	$(CACHE_DIR)parish.sqlite3\
+	\
 	$(CACHE_DIR)ancient-woodland.sqlite3\
 	$(CACHE_DIR)area-of-outstanding-natural-beauty.sqlite3\
 	$(CACHE_DIR)brownfield-land.sqlite3\
 	$(CACHE_DIR)conservation-area.sqlite3\
 	$(CACHE_DIR)development-plan-document.sqlite3\
-	$(CACHE_DIR)development-plan-type.sqlite3\
-	$(CACHE_DIR)development-policy.sqlite3\
-	$(CACHE_DIR)development-policy-category.sqlite3\
 	$(CACHE_DIR)document.sqlite3\
-	$(CACHE_DIR)document-type.sqlite3\
 	$(CACHE_DIR)green-belt.sqlite3\
 	$(CACHE_DIR)heritage-coast.sqlite3\
 	$(CACHE_DIR)historic-england/battlefield.sqlite3\
@@ -27,12 +35,6 @@ DATASETS=\
 	$(CACHE_DIR)historic-england/protected-wreck-site.sqlite3\
 	$(CACHE_DIR)historic-england/scheduled-monument.sqlite3\
 	$(CACHE_DIR)historic-england/world-heritage-site.sqlite3\
-	$(CACHE_DIR)local-authority-district.sqlite3\
-	$(CACHE_DIR)ownership-status.sqlite3\
-	$(CACHE_DIR)parish.sqlite3\
-	$(CACHE_DIR)planning-permission-status.sqlite3\
-	$(CACHE_DIR)planning-permission-type.sqlite3\
-	$(CACHE_DIR)site-category.sqlite3\
 	$(CACHE_DIR)special-area-of-conservation.sqlite3
 
 test:
