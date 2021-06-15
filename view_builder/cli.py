@@ -1,5 +1,4 @@
 import click
-from pathlib import Path
 from digital_land.model.entity import Entity
 from digital_land.repository.entry_repository import EntryRepository
 from view_builder.builder import ViewBuilder
@@ -11,7 +10,6 @@ from sqlalchemy import create_engine
 from view_builder.organisation_loader import (
     load_organisations as load_organisations_from_file,
 )
-from view_builder.collect import collect_file
 
 
 @click.group()
@@ -60,14 +58,6 @@ def build(debug, allow_broken_relationships, dataset_name, input_path, output_pa
 
 
 cli.add_command(build)
-
-@click.command("collect", short_help="download a sqlite dataset")
-@click.argument("dataset_name", type=click.STRING)
-@click.argument("output_path", type=click.Path(exists=True))
-def collect(dataset_name, output_path):
-    collect_file(dataset_name, Path(output_path))
-
-cli.add_command(collect)
 
 
 @click.command("index", short_help="add indexes to view model DB")
