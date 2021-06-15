@@ -792,3 +792,23 @@ class GreenBeltModel(GeographyDatasetModel):
 
 
 factory.register_dataset_model(GreenBeltModel)
+
+
+class RamsarModel(GeographyDatasetModel):
+    dataset_name = "ramsar"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(RamsarModel)
+
+
+class SiteOfSpecialScientificInterest(GeographyDatasetModel):
+    dataset_name = "site-of-special-scientific-interest"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(SiteOfSpecialScientificInterest)

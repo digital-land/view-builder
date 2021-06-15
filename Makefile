@@ -35,7 +35,9 @@ DATASETS=\
 	$(CACHE_DIR)historic-england/protected-wreck-site.sqlite3\
 	$(CACHE_DIR)historic-england/scheduled-monument.sqlite3\
 	$(CACHE_DIR)historic-england/world-heritage-site.sqlite3\
-	$(CACHE_DIR)special-area-of-conservation.sqlite3
+	$(CACHE_DIR)special-area-of-conservation.sqlite3\
+	$(CACHE_DIR)ramsar.sqlite3\
+    $(CACHE_DIR)site-of-special-scientific-interest.sqlite3
 
 test:
 	python -m pytest tests/

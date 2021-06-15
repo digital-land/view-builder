@@ -1,7 +1,12 @@
 SOURCE_URL=https://raw.githubusercontent.com/digital-land/
 
+# deduce the repository
+ifeq ($(REPOSITORY),)
+REPOSITORY=$(shell basename -s .git `git config --get remote.origin.url`)
+endif
+
 define dataset_url
-'https://github.com/digital-land/$(2)-collection/blob/main/dataset/$(1).sqlite3?raw=true'
+'https://collection-dataset.s3.eu-west-2.amazonaws.com/$(2)-collection/dataset/$(1).sqlite3'
 endef
 
 .PHONY: \
@@ -42,6 +47,7 @@ second-pass::
 
 # initialise
 init::
+	pip install --upgrade pip
 ifneq (,$(wildcard requirements.txt))
 	pip3 install --upgrade -r requirements.txt
 endif
