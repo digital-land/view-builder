@@ -1,9 +1,9 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name="view_builder",
     version="0.1",
-    packages=["view_builder"],
+    packages=find_packages(),
     install_requires=[
         "Click",
     ],
