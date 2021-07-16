@@ -804,11 +804,21 @@ class RamsarModel(GeographyDatasetModel):
 factory.register_dataset_model(RamsarModel)
 
 
-class SiteOfSpecialScientificInterest(GeographyDatasetModel):
+class SiteOfSpecialScientificInterestModel(GeographyDatasetModel):
     dataset_name = "site-of-special-scientific-interest"
 
     def __init__(self, session, data: dict):
         GeographyDatasetModel.__init__(self, session, data)
 
 
-factory.register_dataset_model(SiteOfSpecialScientificInterest)
+factory.register_dataset_model(SiteOfSpecialScientificInterestModel)
+
+
+class OpenSpaceModel(GeographyDatasetModel):
+    dataset_name = "open-space"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(OpenSpaceModel)
