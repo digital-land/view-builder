@@ -57,7 +57,7 @@ class Category(Base):
     __tablename__ = "category"
     dl_type = "schema"
     id = Column(Integer, primary_key=True)
-    slug_id = Column(Integer, ForeignKey("slug.id"))
+    slug_id = Column(Integer, ForeignKey("slug.id"), index=True)
     category = Column(String, index=True)
     type = Column(String, index=True)
     reference = Column(String)
