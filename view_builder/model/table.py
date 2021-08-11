@@ -115,7 +115,7 @@ class Geography(Base):
     __tablename__ = "geography"
     dl_type = "schema"
     id = Column(Integer, primary_key=True)
-    slug_id = Column(Integer, ForeignKey("slug.id"))
+    slug_id = Column(Integer, ForeignKey("slug.id"), index=True)
     geography = Column(String, index=True)
     geometry = Column(String)
     point = Column(String)
@@ -195,7 +195,7 @@ class Policy(Base):
     __tablename__ = "policy"
     dl_type = "schema"
     id = Column(Integer, primary_key=True)
-    slug_id = Column(Integer, ForeignKey("slug.id"))
+    slug_id = Column(Integer, ForeignKey("slug.id"), index=True)
     policy = Column(String, index=True, unique=True)
     reference = Column(String)
     name = Column(String)
@@ -249,7 +249,7 @@ class Document(Base):
     __tablename__ = "document"
     dl_type = "schema"
     id = Column(Integer, primary_key=True)
-    slug_id = Column(Integer, ForeignKey("slug.id"))
+    slug_id = Column(Integer, ForeignKey("slug.id"), index=True)
     prefix = Column(String)
     document = Column(String, index=True)
     reference = Column(String)
