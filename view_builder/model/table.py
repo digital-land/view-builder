@@ -18,6 +18,7 @@ class Slug(Base):
     prefix = Column(String)
     slug = Column(String, index=True, unique=True)
 
+    organisation = relationship("Organisation", back_populates="slug")
     category = relationship("Category", back_populates="slug")
     geography = relationship("Geography", back_populates="slug")
     document = relationship("Document", back_populates="slug")
@@ -83,6 +84,7 @@ class Organisation(Base):
     __tablename__ = "organisation"
     dl_type = "schema"
     id = Column(Integer, primary_key=True)
+    slug_id = Column(Integer, ForeignKey("slug.id"))
     prefix = Column(String)
     organisation = Column(String, index=True, unique=True)
     reference = Column(String)
@@ -91,6 +93,7 @@ class Organisation(Base):
     start_date = Column(Date)
     end_date = Column(Date)
 
+    slug = relationship("Slug", back_populates="organisation")
     geographies = relationship("OrganisationGeography", back_populates="organisation")
     policies = relationship("PolicyOrganisation", back_populates="organisation")
     documents = relationship("DocumentOrganisation", back_populates="organisation")

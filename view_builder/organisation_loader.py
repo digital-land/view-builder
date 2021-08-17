@@ -1,5 +1,5 @@
 import csv
-from view_builder.model.table import Organisation
+from view_builder.model.table import Organisation, Slug
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from datetime import date
@@ -13,6 +13,7 @@ def load_organisations(path):
         writer = csv.DictReader(f)
         for row in writer:
             org = Organisation(
+                slug= Slug(slug="/" + row["organisation"].replace(":", "/")),
                 organisation=row["organisation"],
                 name=row["name"],
             )
