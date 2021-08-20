@@ -13,7 +13,7 @@ def load_organisations(path):
         writer = csv.DictReader(f)
         for row in writer:
             org = Organisation(
-                slug= Slug(slug="/" + row["organisation"].replace(":", "/")),
+                slug= Slug(slug="/organisation/" + row["organisation"].replace(":", "/")),
                 organisation=row["organisation"],
                 name=row["name"],
             )
