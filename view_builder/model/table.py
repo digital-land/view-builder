@@ -11,21 +11,20 @@ from sqlalchemy import (
 Base = declarative_base()
 
 
-class Slug(Base):
-    __tablename__ = "slug"
+class Entity(Base):
+    __tablename__ = "entity"
     dl_type = None
-    id = Column(Integer, primary_key=True)
+    entity = Column(Integer, primary_key=True, index=True)
     prefix = Column(String)
-    slug = Column(String, index=True, unique=True)
 
-    organisation = relationship("Organisation", back_populates="slug")
-    category = relationship("Category", back_populates="slug")
-    geography = relationship("Geography", back_populates="slug")
-    document = relationship("Document", back_populates="slug")
-    policy = relationship("Policy", back_populates="slug")
+    organisation = relationship("Organisation", back_populates="entity_rel")
+    category = relationship("Category", back_populates="entity_rel")
+    geography = relationship("Geography", back_populates="entity_rel")
+    document = relationship("Document", back_populates="entity_rel")
+    policy = relationship("Policy", back_populates="entity_rel")
 
     def __repr__(self):
-        return "Slug({})".format(
+        return "Entity({})".format(
             {key: getattr(self, key) for key in self.__table__.columns.keys()}
         )
 
@@ -58,7 +57,7 @@ class Category(Base):
     __tablename__ = "category"
     dl_type = "schema"
     id = Column(Integer, primary_key=True)
-    slug_id = Column(Integer, ForeignKey("slug.id"), index=True)
+    entity = Column(Integer, ForeignKey("entity.entity"), index=True)
     category = Column(String, index=True)
     type = Column(String, index=True)
     reference = Column(String)
@@ -69,7 +68,7 @@ class Category(Base):
 
     __table_args__ = (UniqueConstraint("category", "type"),)
 
-    slug = relationship("Slug", back_populates="category")
+    entity_rel = relationship("Entity", back_populates="category")
     documents = relationship("DocumentCategory", back_populates="category")
     policies = relationship("PolicyCategory", back_populates="category")
     geographies = relationship("GeographyCategory", back_populates="category")
@@ -84,7 +83,7 @@ class Organisation(Base):
     __tablename__ = "organisation"
     dl_type = "schema"
     id = Column(Integer, primary_key=True)
-    slug_id = Column(Integer, ForeignKey("slug.id"))
+    entity = Column(Integer, ForeignKey("entity.entity"))
     prefix = Column(String)
     organisation = Column(String, index=True, unique=True)
     reference = Column(String)
@@ -93,7 +92,7 @@ class Organisation(Base):
     start_date = Column(Date)
     end_date = Column(Date)
 
-    slug = relationship("Slug", back_populates="organisation")
+    entity_rel = relationship("Entity", back_populates="organisation")
     geographies = relationship("OrganisationGeography", back_populates="organisation")
     policies = relationship("PolicyOrganisation", back_populates="organisation")
     documents = relationship("DocumentOrganisation", back_populates="organisation")
@@ -118,7 +117,7 @@ class Geography(Base):
     __tablename__ = "geography"
     dl_type = "schema"
     id = Column(Integer, primary_key=True)
-    slug_id = Column(Integer, ForeignKey("slug.id"), index=True)
+    entity = Column(Integer, ForeignKey("entity.entity"), index=True)
     geography = Column(String, index=True)
     geometry = Column(String)
     point = Column(String)
@@ -130,7 +129,7 @@ class Geography(Base):
     start_date = Column(Date)
     end_date = Column(Date)
 
-    slug = relationship("Slug", back_populates="geography")
+    entity_rel = relationship("Entity", back_populates="geography")
     organisations = relationship("OrganisationGeography", back_populates="geography")
     policies = relationship("PolicyGeography", back_populates="geography")
     documents = relationship("DocumentGeography", back_populates="geography")
@@ -198,7 +197,7 @@ class Policy(Base):
     __tablename__ = "policy"
     dl_type = "schema"
     id = Column(Integer, primary_key=True)
-    slug_id = Column(Integer, ForeignKey("slug.id"), index=True)
+    entity = Column(Integer, ForeignKey("entity.entity"), index=True)
     policy = Column(String, index=True, unique=True)
     reference = Column(String)
     name = Column(String)
@@ -208,7 +207,7 @@ class Policy(Base):
     start_date = Column(Date)
     end_date = Column(Date)
 
-    slug = relationship("Slug", back_populates="policy")
+    entity_rel = relationship("Entity", back_populates="policy")
     documents = relationship("PolicyDocument", back_populates="policy")
     categories = relationship("PolicyCategory", back_populates="policy")
     geographies = relationship("PolicyGeography", back_populates="policy")
@@ -252,7 +251,7 @@ class Document(Base):
     __tablename__ = "document"
     dl_type = "schema"
     id = Column(Integer, primary_key=True)
-    slug_id = Column(Integer, ForeignKey("slug.id"), index=True)
+    entity = Column(Integer, ForeignKey("entity.entity"), index=True)
     prefix = Column(String)
     document = Column(String, index=True)
     reference = Column(String)
@@ -264,7 +263,7 @@ class Document(Base):
     start_date = Column(Date)
     end_date = Column(Date)
 
-    slug = relationship("Slug", back_populates="document")
+    entity_rel = relationship("Entity", back_populates="document")
     categories = relationship("DocumentCategory", back_populates="document")
     policies = relationship("PolicyDocument", back_populates="document")
     geographies = relationship("DocumentGeography", back_populates="document")

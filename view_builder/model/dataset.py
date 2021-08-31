@@ -2,7 +2,7 @@ import logging
 from datetime import date
 from sqlalchemy.orm.exc import NoResultFound
 from view_builder.model.table import (
-    Slug,
+    Entity,
     Category,
     Organisation,
     Geography,
@@ -51,8 +51,8 @@ class DatasetModel:
         self.data = data
         self.session = session
 
-        if not data.get("slug", None):
-            raise ValueError("Data missing slug field")
+        if not data.get("entity", None):
+            raise ValueError("Data missing entity field")
 
         if not data.get("entry-date", None):
             raise ValueError("Entry missing entry-date")
@@ -88,8 +88,8 @@ class DatasetModel:
             self.session.query(Geography).filter(Geography.geography == geography).one()
         )
 
-    def get_slug(self, slug):
-        return self.session.query(Slug).filter(Slug.slug == slug).one()
+    def get_entity(self, entity):
+        return self.session.query(Entity).filter(Entity.entity == entity).one()
 
     def get_policy(self, policy):
         return self.session.query(Policy).filter(Policy.policy == policy).one()
@@ -99,7 +99,7 @@ class DatasetModel:
             orm = get_relation_func(to_item)
         except NoResultFound:
             message = "Relationship could not be formed between {} and {}".format(
-                from_item.slug.slug, to_item
+                from_item.entity.entity, to_item
             )
             if allow_broken:
                 logger.debug(message)
@@ -113,8 +113,10 @@ class DatasetModel:
 class CategoryDatasetModel(DatasetModel):
     def __init__(self, session, data: dict):
         DatasetModel.__init__(self, session, data)
-        self.slug = {
-            key: data[key] for key in Slug.__table__.columns.keys() if key in self.data
+        self.entity = {
+            key: data[key]
+            for key in Entity.__table__.columns.keys()
+            if key in self.data
         }
         self.category = {
             key: data[key]
@@ -127,8 +129,8 @@ class CategoryDatasetModel(DatasetModel):
         self.category["type"] = self.dataset_name
 
     def to_orm(self, allow_broken_relationships=False):
-        slug = Slug(**self.slug)
-        category = Category(**self.category, slug=slug)
+        entity = Entity(**self.entity)
+        category = Category(**self.category, entity_rel=entity)
         return [category]
 
 
@@ -138,8 +140,10 @@ class GeographyDatasetModel(DatasetModel):
 
     def __init__(self, session, data: dict):
         DatasetModel.__init__(self, session, data)
-        self.slug = {
-            key: data[key] for key in Slug.__table__.columns.keys() if key in self.data
+        self.entity = {
+            key: data[key]
+            for key in Entity.__table__.columns.keys()
+            if key in self.data
         }
         self.geography = {
             key: data[key]
@@ -150,8 +154,8 @@ class GeographyDatasetModel(DatasetModel):
 
     def to_orm(self, allow_broken_relationships=False):
         orms = []
-        slug = Slug(**self.slug)
-        geography = Geography(**self.geography, slug=slug)
+        entity = Entity(**self.entity)
+        geography = Geography(**self.geography, entity_rel=entity)
         orms.append(geography)
 
         if "organisation" in self.data and self.data["organisation"]:
@@ -287,8 +291,10 @@ class DevelopmentPolicyModel(DatasetModel):
 
     def __init__(self, session, data: dict):
         DatasetModel.__init__(self, session, data)
-        self.slug = {
-            key: data[key] for key in Slug.__table__.columns.keys() if key in self.data
+        self.entity = {
+            key: data[key]
+            for key in Entity.__table__.columns.keys()
+            if key in self.data
         }
         self.policy = {
             key: data[key]
@@ -313,8 +319,8 @@ class DevelopmentPolicyModel(DatasetModel):
 
     def to_orm(self, allow_broken_relationships=False):
         orms = []
-        slug = Slug(**self.slug)
-        policy = Policy(**self.policy, slug=slug)
+        entity = Entity(**self.entity)
+        policy = Policy(**self.policy, entity_rel=entity)
 
         orms.append(policy)
 
@@ -362,8 +368,10 @@ class DevelopmentPlanDocumentModel(DatasetModel):
 
     def __init__(self, session, data: dict):
         DatasetModel.__init__(self, session, data)
-        self.slug = {
-            key: data[key] for key in Slug.__table__.columns.keys() if key in self.data
+        self.entity = {
+            key: data[key]
+            for key in Entity.__table__.columns.keys()
+            if key in self.data
         }
         self.document = {
             key: data[key]
@@ -398,8 +406,8 @@ class DevelopmentPlanDocumentModel(DatasetModel):
 
     def to_orm(self, allow_broken_relationships=False):
         orms = []
-        slug = Slug(**self.slug)
-        document = Document(**self.document, slug=slug)
+        entity = Entity(**self.entity)
+        document = Document(**self.document, entity_rel=entity)
 
         orms.append(document)
 
@@ -459,8 +467,10 @@ class DocumentModel(DatasetModel):
 
     def __init__(self, session, data: dict):
         DatasetModel.__init__(self, session, data)
-        self.slug = {
-            key: data[key] for key in Slug.__table__.columns.keys() if key in self.data
+        self.entity = {
+            key: data[key]
+            for key in Entity.__table__.columns.keys()
+            if key in self.data
         }
         self.document = {
             key: data[key]
@@ -492,8 +502,8 @@ class DocumentModel(DatasetModel):
 
     def to_orm(self, allow_broken_relationships=False):
         orms = []
-        slug = Slug(**self.slug)
-        document = Document(**self.document, slug=slug)
+        entity = Entity(**self.entity)
+        document = Document(**self.document, entity_rel=entity)
 
         orms.append(document)
 
@@ -528,18 +538,18 @@ class DocumentModel(DatasetModel):
                 )
                 orms.append(relationship)
 
-        # Geographies in Document are referenced by slug, not by code
+        # Geographies in Document are referenced by entity, not by code
         for geography in self.geographies:
-            geography_slug = self.find_relation(
-                self.get_slug,
+            geography_entity = self.find_relation(
+                self.get_entity,
                 document,
                 geography,
                 allow_broken_relationships,
             )
 
-            if geography_slug and geography_slug.geography:
+            if geography_entity and geography_entity.geography:
                 relationship = DocumentGeography(
-                    geography=geography_slug.geography[0], document=document
+                    geography=geography_entity.geography[0], document=document
                 )
                 orms.append(relationship)
 

@@ -14,7 +14,7 @@ def entry_repository(tmp_path):
     today = datetime.date.today().isoformat()
     data = [{"name": "Some Type", "entry-date": today}]
     for idx, d in enumerate(data, start=1):
-        repo.add(Entry(dict(d, slug=f"/abc/{idx}"), "abc123", idx))
+        repo.add(Entry(dict(d, entity=1, slug=f"/abc/{idx}"), "abc123", idx))
     return str(repo_path)
 
 
@@ -41,7 +41,7 @@ def test_view_model(entry_repository, tmp_path):
     assert len(rows) == 1
     assert rows[0][0] == "Some Type"
 
-    c.execute("SELECT slug FROM slug")
+    c.execute("SELECT entity FROM entity")
     rows = c.fetchall()
     assert len(rows) == 1
-    assert rows[0][0] == "/abc/1"
+    assert rows[0][0] == 1

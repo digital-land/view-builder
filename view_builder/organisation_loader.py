@@ -1,5 +1,5 @@
 import csv
-from view_builder.model.table import Organisation, Slug
+from view_builder.model.table import Organisation, Entity
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from datetime import date
@@ -11,9 +11,10 @@ def load_organisations(path):
         engine
     ) as session:
         writer = csv.DictReader(f)
+        counter = 1
         for row in writer:
             org = Organisation(
-                slug= Slug(slug="/organisation/" + row["organisation"].replace(":", "/")),
+                entity_rel=Entity(entity=counter),
                 organisation=row["organisation"],
                 name=row["name"],
             )
@@ -24,6 +25,7 @@ def load_organisations(path):
             if row.get("end-date", ""):
                 org.end_date = date.fromisoformat(row["end-date"])
             session.add(org)
+            counter = counter + 1
         session.commit()
 
 
