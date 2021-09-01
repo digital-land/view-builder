@@ -15,6 +15,8 @@ class Entity(Base):
     __tablename__ = "entity"
     dl_type = None
     entity = Column(Integer, primary_key=True, index=True)
+    dataset = Column(String)
+    typology = Column(String)
     prefix = Column(String)
 
     organisation = relationship("Organisation", back_populates="entity_rel")

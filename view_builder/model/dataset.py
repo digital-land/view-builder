@@ -66,6 +66,15 @@ class DatasetModel:
         if self.data["entry_date"] > date.today():
             raise ValueError("entry-date cannot be in the future")
 
+        self.entity = {
+            key: data[key]
+            for key in Entity.__table__.columns.keys()
+            if key in self.data
+        }
+
+        self.entity["dataset"] = self.dataset_name
+        self.entity["typology"] = self.typology
+
     def to_orm(self, allow_broken_relationships=False):
         raise NotImplementedError()
 
@@ -111,13 +120,13 @@ class DatasetModel:
 
 
 class CategoryDatasetModel(DatasetModel):
+
+    dataset_name = None
+    typology = "category"
+
     def __init__(self, session, data: dict):
         DatasetModel.__init__(self, session, data)
-        self.entity = {
-            key: data[key]
-            for key in Entity.__table__.columns.keys()
-            if key in self.data
-        }
+
         self.category = {
             key: data[key]
             for key in Category.__table__.columns.keys()
@@ -137,14 +146,11 @@ class CategoryDatasetModel(DatasetModel):
 class GeographyDatasetModel(DatasetModel):
 
     dataset_name = None
+    typology = "geography"
 
     def __init__(self, session, data: dict):
         DatasetModel.__init__(self, session, data)
-        self.entity = {
-            key: data[key]
-            for key in Entity.__table__.columns.keys()
-            if key in self.data
-        }
+
         self.geography = {
             key: data[key]
             for key in Geography.__table__.columns.keys()
@@ -288,14 +294,11 @@ factory.register_dataset_model(ConservationAreaModel)
 class DevelopmentPolicyModel(DatasetModel):
 
     dataset_name = "development-policy"
+    typology = "policy"
 
     def __init__(self, session, data: dict):
         DatasetModel.__init__(self, session, data)
-        self.entity = {
-            key: data[key]
-            for key in Entity.__table__.columns.keys()
-            if key in self.data
-        }
+
         self.policy = {
             key: data[key]
             for key in Policy.__table__.columns.keys()
@@ -365,14 +368,11 @@ factory.register_dataset_model(DevelopmentPolicyModel)
 class DevelopmentPlanDocumentModel(DatasetModel):
 
     dataset_name = "development-plan-document"
+    typology = "document"
 
     def __init__(self, session, data: dict):
         DatasetModel.__init__(self, session, data)
-        self.entity = {
-            key: data[key]
-            for key in Entity.__table__.columns.keys()
-            if key in self.data
-        }
+
         self.document = {
             key: data[key]
             for key in Document.__table__.columns.keys()
@@ -464,14 +464,11 @@ factory.register_dataset_model(DevelopmentPlanDocumentModel)
 class DocumentModel(DatasetModel):
 
     dataset_name = "document"
+    typology = "document"
 
     def __init__(self, session, data: dict):
         DatasetModel.__init__(self, session, data)
-        self.entity = {
-            key: data[key]
-            for key in Entity.__table__.columns.keys()
-            if key in self.data
-        }
+
         self.document = {
             key: data[key]
             for key in Document.__table__.columns.keys()

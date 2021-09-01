@@ -14,7 +14,9 @@ def load_organisations(path):
         counter = 1
         for row in writer:
             org = Organisation(
-                entity_rel=Entity(entity=counter),
+                entity_rel=Entity(
+                    entity=counter, typology="organisation", dataset="organisation"
+                ),
                 organisation=row["organisation"],
                 name=row["name"],
             )
