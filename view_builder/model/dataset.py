@@ -822,3 +822,12 @@ class OpenSpaceModel(GeographyDatasetModel):
 
 
 factory.register_dataset_model(OpenSpaceModel)
+
+class BrownfieldSiteModel(GeographyDatasetModel):
+    dataset_name = "brownfield-site"
+
+    def __init__(self, session, data: dict):
+        GeographyDatasetModel.__init__(self, session, data)
+
+
+factory.register_dataset_model(BrownfieldSiteModel)
