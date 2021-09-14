@@ -34,9 +34,9 @@ class Entity(Base):
 class PolicyCategory(Base):
     __tablename__ = "policy_category"
     dl_type = "join"
-    policy_id = Column(Integer, ForeignKey("policy.id"), primary_key=True, index=True)
+    policy_id = Column(Integer, ForeignKey("policy.entity"), primary_key=True, index=True)
     category_id = Column(
-        Integer, ForeignKey("category.id"), primary_key=True, index=True
+        Integer, ForeignKey("category.entity"), primary_key=True, index=True
     )
     category = relationship("Category", back_populates="policies")
     policy = relationship("Policy", back_populates="categories")
@@ -46,10 +46,10 @@ class DocumentCategory(Base):
     __tablename__ = "document_category"
     dl_type = "join"
     document_id = Column(
-        Integer, ForeignKey("document.id"), primary_key=True, index=True
+        Integer, ForeignKey("document.entity"), primary_key=True, index=True
     )
     category_id = Column(
-        Integer, ForeignKey("category.id"), primary_key=True, index=True
+        Integer, ForeignKey("category.entity"), primary_key=True, index=True
     )
     document = relationship("Document", back_populates="categories")
     category = relationship("Category", back_populates="documents")
@@ -58,8 +58,7 @@ class DocumentCategory(Base):
 class Category(Base):
     __tablename__ = "category"
     dl_type = "schema"
-    id = Column(Integer, primary_key=True)
-    entity = Column(Integer, ForeignKey("entity.entity"), index=True)
+    entity = Column(Integer, ForeignKey("entity.entity"), primary_key=True, index=True)
     category = Column(String, index=True)
     type = Column(String, index=True)
     reference = Column(String)
@@ -84,8 +83,7 @@ class Category(Base):
 class Organisation(Base):
     __tablename__ = "organisation"
     dl_type = "schema"
-    id = Column(Integer, primary_key=True)
-    entity = Column(Integer, ForeignKey("entity.entity"))
+    entity = Column(Integer, ForeignKey("entity.entity"), primary_key=True, index=True)
     prefix = Column(String)
     organisation = Column(String, index=True, unique=True)
     reference = Column(String)
@@ -118,8 +116,7 @@ class Metric(Base):
 class Geography(Base):
     __tablename__ = "geography"
     dl_type = "schema"
-    id = Column(Integer, primary_key=True)
-    entity = Column(Integer, ForeignKey("entity.entity"), index=True)
+    entity = Column(Integer, ForeignKey("entity.entity"), primary_key=True, index=True)
     geography = Column(String, index=True)
     geometry = Column(String)
     point = Column(String)
@@ -148,10 +145,10 @@ class OrganisationGeography(Base):
     __tablename__ = "organisation_geography"
     dl_type = "join"
     organisation_id = Column(
-        Integer, ForeignKey("organisation.id"), primary_key=True, index=True
+        Integer, ForeignKey("organisation.entity"), primary_key=True, index=True
     )
     geography_id = Column(
-        Integer, ForeignKey("geography.id"), primary_key=True, index=True
+        Integer, ForeignKey("geography.entity"), primary_key=True, index=True
     )
     entry_date = Column(Date)
     start_date = Column(Date)
@@ -164,10 +161,10 @@ class GeographyCategory(Base):
     __tablename__ = "geography_category"
     dl_type = "join"
     category_id = Column(
-        Integer, ForeignKey("category.id"), primary_key=True, index=True
+        Integer, ForeignKey("category.entity"), primary_key=True, index=True
     )
     geography_id = Column(
-        Integer, ForeignKey("geography.id"), primary_key=True, index=True
+        Integer, ForeignKey("geography.entity"), primary_key=True, index=True
     )
     geography = relationship("Geography", back_populates="categories")
     category = relationship("Category", back_populates="geographies")
@@ -178,7 +175,7 @@ class GeographyMetric(Base):
     dl_type = "join"
     metric_id = Column(Integer, ForeignKey("metric.id"), primary_key=True, index=True)
     geography_id = Column(
-        Integer, ForeignKey("geography.id"), primary_key=True, index=True
+        Integer, ForeignKey("geography.entity"), primary_key=True, index=True
     )
     geography = relationship("Geography", back_populates="metrics")
     metric = relationship("Metric", back_populates="geography")
@@ -187,9 +184,9 @@ class GeographyMetric(Base):
 class PolicyDocument(Base):
     __tablename__ = "policy_document"
     dl_type = "join"
-    policy_id = Column(Integer, ForeignKey("policy.id"), primary_key=True, index=True)
+    policy_id = Column(Integer, ForeignKey("policy.entity"), primary_key=True, index=True)
     document_id = Column(
-        Integer, ForeignKey("document.id"), primary_key=True, index=True
+        Integer, ForeignKey("document.entity"), primary_key=True, index=True
     )
     document = relationship("Document", back_populates="policies")
     policy = relationship("Policy", back_populates="documents")
@@ -198,8 +195,7 @@ class PolicyDocument(Base):
 class Policy(Base):
     __tablename__ = "policy"
     dl_type = "schema"
-    id = Column(Integer, primary_key=True)
-    entity = Column(Integer, ForeignKey("entity.entity"), index=True)
+    entity = Column(Integer, ForeignKey("entity.entity"), primary_key=True, index=True)
     policy = Column(String, index=True, unique=True)
     reference = Column(String)
     name = Column(String)
@@ -224,9 +220,9 @@ class Policy(Base):
 class PolicyGeography(Base):
     __tablename__ = "policy_geography"
     dl_type = "join"
-    policy_id = Column(Integer, ForeignKey("policy.id"), primary_key=True, index=True)
+    policy_id = Column(Integer, ForeignKey("policy.entity"), primary_key=True, index=True)
     geography_id = Column(
-        Integer, ForeignKey("geography.id"), primary_key=True, index=True
+        Integer, ForeignKey("geography.entity"), primary_key=True, index=True
     )
     entry_date = Column(Date)
     start_date = Column(Date)
@@ -238,9 +234,9 @@ class PolicyGeography(Base):
 class PolicyOrganisation(Base):
     __tablename__ = "policy_organisation"
     dl_type = "join"
-    policy_id = Column(Integer, ForeignKey("policy.id"), primary_key=True, index=True)
+    policy_id = Column(Integer, ForeignKey("policy.entity"), primary_key=True, index=True)
     organisation_id = Column(
-        Integer, ForeignKey("organisation.id"), primary_key=True, index=True
+        Integer, ForeignKey("organisation.entity"), primary_key=True, index=True
     )
     entry_date = Column(Date)
     start_date = Column(Date)
@@ -252,8 +248,7 @@ class PolicyOrganisation(Base):
 class Document(Base):
     __tablename__ = "document"
     dl_type = "schema"
-    id = Column(Integer, primary_key=True)
-    entity = Column(Integer, ForeignKey("entity.entity"), index=True)
+    entity = Column(Integer, ForeignKey("entity.entity"), primary_key=True, index=True)
     prefix = Column(String)
     document = Column(String, index=True)
     reference = Column(String)
@@ -281,10 +276,10 @@ class DocumentGeography(Base):
     __tablename__ = "document_geography"
     dl_type = "join"
     document_id = Column(
-        Integer, ForeignKey("document.id"), primary_key=True, index=True
+        Integer, ForeignKey("document.entity"), primary_key=True, index=True
     )
     geography_id = Column(
-        Integer, ForeignKey("geography.id"), primary_key=True, index=True
+        Integer, ForeignKey("geography.entity"), primary_key=True, index=True
     )
     entry_date = Column(Date)
     start_date = Column(Date)
@@ -297,10 +292,10 @@ class DocumentOrganisation(Base):
     __tablename__ = "document_organisation"
     dl_type = "join"
     document_id = Column(
-        Integer, ForeignKey("document.id"), primary_key=True, index=True
+        Integer, ForeignKey("document.entity"), primary_key=True, index=True
     )
     organisation_id = Column(
-        Integer, ForeignKey("organisation.id"), primary_key=True, index=True
+        Integer, ForeignKey("organisation.entity"), primary_key=True, index=True
     )
     entry_date = Column(Date)
     start_date = Column(Date)
