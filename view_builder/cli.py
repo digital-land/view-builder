@@ -54,7 +54,7 @@ def build(debug, allow_broken_relationships, dataset_name, input_path, output_pa
         log=debug,
     )
     builder.init_model(Base.metadata)
-    builder.build_model(dataset_name, reader)
+    builder.build_model(dataset_name, reader, len(entities))
 
 
 cli.add_command(build)
