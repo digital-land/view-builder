@@ -108,7 +108,7 @@ class DatasetModel:
             orm = get_relation_func(to_item)
         except NoResultFound:
             message = "Relationship could not be formed between {} and {}".format(
-                from_item.entity.entity, to_item
+                from_item.entity, to_item
             )
             if allow_broken:
                 logger.debug(message)
