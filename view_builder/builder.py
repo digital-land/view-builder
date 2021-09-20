@@ -17,7 +17,7 @@ class ViewBuilder:
 
     def build_model(self, dataset_name, reader, total=None):
         with Session(self._engine) as session:
-            with tqdm(total=total) as pbar:
+            with tqdm(total=total, miniters=500) as pbar:
                 for item in reader:
                     orm_objects = self._item_mapper(dataset_name, session, item)
                     for obj in orm_objects:
