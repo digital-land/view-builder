@@ -22,36 +22,20 @@ jobs:
     - name: Lint, Test, Coverage
       run: |
         make test
-    # - name: Collect
-    #   run: |
-    #     make collect
-    # - name: Build
-    #   run: |
-    #     make build
-    # - name: Configure AWS Credentials
-    #   uses: aws-actions/configure-aws-credentials@v1
-    #   with:
-    #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    #     aws-region: eu-west-2
-    # - name: Login to DockerHub
-    #   uses: docker/login-action@v1
-    #   with:
-    #     username: ${{ secrets.DOCKER_USERNAME }}
-    #     password: ${{ secrets.DOCKER_TOKEN }}
-    # - name: Push
-    #   run: |
-    #     make push
-    # - name: Sleep for 30 seconds
-    #   uses: jakejarvis/wait-action@master
-    #   with:
-    #     time: '30s'
-    # - name: Deploy
-    #   run: |
-    #     aws elasticbeanstalk update-environment --application-name datasette-aws-docker --environment-name Datasetteawsdocker-env --version-label datasette-aws-docker-source-2
-    # - name: Docker images
-    #   run: |
-    #     docker images
-    # - name: Docker ps
-    #   run: |
-    #     docker ps -a
+    - name: Collect
+      run: |
+        make collect
+    - name: Build
+      run: |
+        make build
+        make postprocess
+        make generate-tiles
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-west-2
+    - name: Push
+      run: |
+        make push

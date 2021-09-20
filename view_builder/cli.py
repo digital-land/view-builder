@@ -10,6 +10,7 @@ from sqlalchemy import create_engine
 from view_builder.organisation_loader import (
     load_organisations as load_organisations_from_file,
 )
+from .tiles import build_tiles_for_datasets
 
 
 @click.group()
@@ -77,3 +78,13 @@ def load_organisations(output_path):
 
 
 cli.add_command(load_organisations)
+
+
+@click.command()
+@click.argument("view_model_path", type=click.Path(exists=True))
+@click.argument("output_path", type=click.Path())
+def build_tiles(view_model_path, output_path):
+    build_tiles_for_datasets(view_model_path, output_path)
+
+
+cli.add_command(build_tiles)

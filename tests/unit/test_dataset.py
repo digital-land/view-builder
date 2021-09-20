@@ -38,13 +38,13 @@ class DummyModel:
 
 
 dummy_organisation = Organisation(
-    id=1, organisation="government-organisation:CCC", name="some organisation"
+    entity=1, organisation="government-organisation:CCC", name="some organisation"
 )
 dummy_geography = Geography(
-    id=1, geography="government-geography:A000000", name="some geography"
+    entity=1, geography="government-geography:A000000", name="some geography"
 )
-dummy_category = Category(id=1, category="A category", name="some category")
-dummy_policy = Policy(id=1, policy="A policy", name="some policy")
+dummy_category = Category(entity=1, category="A category", name="some category")
+dummy_policy = Policy(entity=1, policy="A policy", name="some policy")
 dummy_entity = Entity(entity=1)
 
 
@@ -176,7 +176,7 @@ def test_geography_dataset_model(mocker):
         "extra_field": "ZZZ",
     }
     test_organisation = Organisation(
-        id=1, organisation="government-organisation:CCC", name="some organisation"
+        entity=1, organisation="government-organisation:CCC", name="some organisation"
     )
     mocker.patch(
         "view_builder.model.dataset.GeographyDatasetModel.get_organisation",
@@ -498,7 +498,9 @@ def test_brownfield_land_model(mocker, mock_get_organisation):
 
     mocker.patch(
         "view_builder.model.dataset.BrownfieldLandModel.get_category",
-        lambda self, category, type: Category(id=1, category=category, name=category),
+        lambda self, category, type: Category(
+            entity=1, category=category, name=category
+        ),
     )
 
     brownfield_orm = BrownfieldLandModel(None, test_data)

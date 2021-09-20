@@ -47,6 +47,9 @@ factory = DatasetModelFactory()
 
 
 class DatasetModel:
+    dataset_name = None
+    typology = None
+
     def __init__(self, session, data: dict):
         self.data = data
         self.session = session

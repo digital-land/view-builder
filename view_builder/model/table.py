@@ -34,7 +34,9 @@ class Entity(Base):
 class PolicyCategory(Base):
     __tablename__ = "policy_category"
     dl_type = "join"
-    policy_id = Column(Integer, ForeignKey("policy.entity"), primary_key=True, index=True)
+    policy_id = Column(
+        Integer, ForeignKey("policy.entity"), primary_key=True, index=True
+    )
     category_id = Column(
         Integer, ForeignKey("category.entity"), primary_key=True, index=True
     )
@@ -184,7 +186,9 @@ class GeographyMetric(Base):
 class PolicyDocument(Base):
     __tablename__ = "policy_document"
     dl_type = "join"
-    policy_id = Column(Integer, ForeignKey("policy.entity"), primary_key=True, index=True)
+    policy_id = Column(
+        Integer, ForeignKey("policy.entity"), primary_key=True, index=True
+    )
     document_id = Column(
         Integer, ForeignKey("document.entity"), primary_key=True, index=True
     )
@@ -220,7 +224,9 @@ class Policy(Base):
 class PolicyGeography(Base):
     __tablename__ = "policy_geography"
     dl_type = "join"
-    policy_id = Column(Integer, ForeignKey("policy.entity"), primary_key=True, index=True)
+    policy_id = Column(
+        Integer, ForeignKey("policy.entity"), primary_key=True, index=True
+    )
     geography_id = Column(
         Integer, ForeignKey("geography.entity"), primary_key=True, index=True
     )
@@ -234,7 +240,9 @@ class PolicyGeography(Base):
 class PolicyOrganisation(Base):
     __tablename__ = "policy_organisation"
     dl_type = "join"
-    policy_id = Column(Integer, ForeignKey("policy.entity"), primary_key=True, index=True)
+    policy_id = Column(
+        Integer, ForeignKey("policy.entity"), primary_key=True, index=True
+    )
     organisation_id = Column(
         Integer, ForeignKey("organisation.entity"), primary_key=True, index=True
     )
