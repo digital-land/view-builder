@@ -90,7 +90,7 @@ postprocess:
 
 generate-tiles: tippecanoe-check
 	view_builder build-tiles $(VIEW_MODEL_DB) $(CACHE_DIR)
-	gsed -i '1s/^/{"type":"FeatureCollection","features":[/' $(CACHE_DIR)geometry.txt
+	sed -i '1s/^/{"type":"FeatureCollection","features":[/' $(CACHE_DIR)geometry.txt
 	echo ']}' >> $(CACHE_DIR)geometry.txt
 	tr '\n' , < $(CACHE_DIR)geometry.txt > $(CACHE_DIR)geometry.geojson
 	tippecanoe -z15 -Z4 -r1 --no-feature-limit --no-tile-size-limit -o $(CACHE_DIR)dataset_tiles.mbtiles $(CACHE_DIR)geometry.geojson
