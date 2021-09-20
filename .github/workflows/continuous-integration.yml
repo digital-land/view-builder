@@ -16,6 +16,21 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.8
+    - name: Install spatialite
+      run: |
+        sudo apt-get update
+        sudo apt-get install sqlite3 libsqlite3-mod-spatialite
+        sudo dpkg -L libsqlite3-mod-spatialite
+    - name: Build and Install tippecanoe
+      run: |
+        git clone https://github.com/mapbox/tippecanoe.git
+        cd tippecanoe
+        sudo make -j
+        sudo make install
+        cd ..
+    - name: Make makerules
+      run: |
+        make makerules
     - name: Make Init
       run: |
         make init
