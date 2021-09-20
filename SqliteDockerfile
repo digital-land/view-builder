@@ -1,0 +1,9 @@
+FROM debian:unstable-slim
+
+RUN apt-get update
+RUN apt-get -y install sqlite3 libsqlite3-mod-spatialite
+
+ADD ./post_process.sql .
+
+ENTRYPOINT ["sqlite3"]
+CMD ["-cmd", ".load /usr/lib/x86_64-linux-gnu/mod_spatialite.so"]
