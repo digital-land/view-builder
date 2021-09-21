@@ -96,7 +96,7 @@ generate-tiles: tippecanoe-check
 	tippecanoe -z15 -Z4 -r1 --no-feature-limit --no-tile-size-limit -o $(CACHE_DIR)dataset_tiles.mbtiles $(CACHE_DIR)geometry.geojson
 
 push:
-	aws s3 sync $(CACHE_DIR) s3://digital-land-view-model --exclude='*' --include='view_model.sqlite3' --include='dataset_tiles.mbtiles'
+	aws s3 sync $(CACHE_DIR) s3://digital-land-view-model --exclude='*' --include='view_model.sqlite3' --include='*.mbtiles'
 
 
 $(CACHE_DIR)organisation.csv:
