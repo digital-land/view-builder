@@ -1,9 +1,9 @@
 include makerules/makerules.mk
 
+BUILD_TAG_FACT := digitalland/fact
+BUILD_TAG_TILE := digitalland/tile
 CACHE_DIR := var/cache/
-VIEW_MODEL_DB := view_model.db
-
-all:: build
+VIEW_MODEL_DB := var/cache/view_model.sqlite3
 
 DATASETS=\
 	$(CACHE_DIR)document-type.sqlite3\
@@ -20,6 +20,7 @@ DATASETS=\
 	$(CACHE_DIR)ancient-woodland.sqlite3\
 	$(CACHE_DIR)area-of-outstanding-natural-beauty.sqlite3\
 	$(CACHE_DIR)brownfield-land.sqlite3\
+	$(CACHE_DIR)brownfield-site.sqlite3\
 	$(CACHE_DIR)conservation-area.sqlite3\
 	$(CACHE_DIR)development-policy.sqlite3\
 	$(CACHE_DIR)development-plan-document.sqlite3\
@@ -40,6 +41,10 @@ DATASETS=\
     	$(CACHE_DIR)site-of-special-scientific-interest.sqlite3\
 	$(CACHE_DIR)open-space.sqlite3
 
+all:: build
+
+collect: $(CACHE_DIR)organisation.csv $(DATASETS)
+
 test:
 	python -m pytest tests/
 
@@ -53,18 +58,46 @@ flake8:
 
 clobber::
 	rm $(VIEW_MODEL_DB)
+	rm $(CACHE_DIR)*
 
-build:: $(VIEW_MODEL_DB)
+docker-check:
+ifeq (, $(shell which docker))
+	$(error "No docker in $(PATH), consider doing apt-get install docker OR brew install --cask docker")
+endif
 
-$(VIEW_MODEL_DB): $(CACHE_DIR)organisation.csv $(DATASETS)
+tippecanoe-check:
+ifeq (, $(shell which tippecanoe))
+	git clone https://github.com/mapbox/tippecanoe.git
+	cd tippecanoe
+	make -j
+	make install
+endif
+
+
+build: $(VIEW_MODEL_DB)
+
+$(VIEW_MODEL_DB):
 	@rm -f $@
 	view_builder create $@
 	view_builder load_organisations $@
 	# this should be in shell or python ..
 	for f in $(DATASETS) ; do echo $$f ; view_builder build --allow-broken-relationships $$(basename $$f .sqlite3) $$f $@ ; done
 
-server:
-	datasette -m metadata.json view_model.db
+
+postprocess:
+	docker build -t sqlite3-spatialite -f SqliteDockerfile .
+	docker run -t --mount src=$(shell pwd),target=/tmp,type=bind sqlite3-spatialite -init ./post_process.sql -bail -echo  /tmp/$(CACHE_DIR)view_model.sqlite3 .exit
+
+generate-tiles: tippecanoe-check
+	view_builder build-tiles $(VIEW_MODEL_DB) $(CACHE_DIR)
+	sed -i '1s/^/{"type":"FeatureCollection","features":[/' $(CACHE_DIR)geometry.txt
+	echo ']}' >> $(CACHE_DIR)geometry.txt
+	tr '\n' , < $(CACHE_DIR)geometry.txt > $(CACHE_DIR)geometry.geojson
+	tippecanoe -z15 -Z4 -r1 --no-feature-limit --no-tile-size-limit -o $(CACHE_DIR)dataset_tiles.mbtiles $(CACHE_DIR)geometry.geojson
+
+push:
+	aws s3 sync $(CACHE_DIR) s3://digital-land-view-model --exclude='*' --include='view_model.sqlite3' --include='*.mbtiles'
+
 
 $(CACHE_DIR)organisation.csv:
 	@mkdir -p $(CACHE_DIR)

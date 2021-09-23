@@ -9,7 +9,7 @@ from view_builder.model.dataset import (
     BrownfieldLandModel,
 )
 from view_builder.model.table import (
-    Slug,
+    Entity,
     Organisation,
     Geography,
     GeographyMetric,
@@ -38,14 +38,14 @@ class DummyModel:
 
 
 dummy_organisation = Organisation(
-    id=1, organisation="government-organisation:CCC", name="some organisation"
+    entity=1, organisation="government-organisation:CCC", name="some organisation"
 )
 dummy_geography = Geography(
-    id=1, geography="government-geography:A000000", name="some geography"
+    entity=1, geography="government-geography:A000000", name="some geography"
 )
-dummy_category = Category(id=1, category="A category", name="some category")
-dummy_policy = Policy(id=1, policy="A policy", name="some policy")
-dummy_slug = Slug(id=1, slug="/a/slug/example")
+dummy_category = Category(entity=1, category="A category", name="some category")
+dummy_policy = Policy(entity=1, policy="A policy", name="some policy")
+dummy_entity = Entity(entity=1)
 
 
 @pytest.fixture
@@ -85,10 +85,10 @@ def mock_get_policy(mocker):
 
 
 @pytest.fixture
-def mock_get_slug(mocker):
+def mock_get_entity(mocker):
     mock_db = mocker.patch(
-        "view_builder.model.dataset.DatasetModel.get_slug",
-        lambda self, slug: dummy_slug,
+        "view_builder.model.dataset.DatasetModel.get_entity",
+        lambda self, entity: dummy_entity,
     )
     return mock_db
 
@@ -111,20 +111,20 @@ def test_dataset_model_date_mapping():
     test_data = {
         "entry-date": "2020-10-04",
         "start-date": "2020-10-05",
-        "slug": "dataset/AAA",
+        "entity": 1,
     }
     DatasetModel(None, test_data)
 
 
-def test_dataset_model_no_slug():
+def test_dataset_model_no_entity():
     test_data = {"entry-date": "2020-10-04", "start-date": "2020-10-05"}
 
-    with pytest.raises(ValueError, match="^Data missing slug field$"):
+    with pytest.raises(ValueError, match="^Data missing entity field$"):
         DatasetModel(None, test_data)
 
 
 def test_dataset_model_no_entry_date():
-    test_data = {"start-date": "2020-10-05", "slug": "dataset/AAA"}
+    test_data = {"start-date": "2020-10-05", "entity": 1}
 
     with pytest.raises(ValueError, match="^Entry missing entry-date$"):
         DatasetModel(None, test_data)
@@ -135,7 +135,7 @@ def test_dataset_model_future_entry_date():
     test_data = {
         "entry-date": tomorrow.isoformat(),
         "start-date": "2020-10-05",
-        "slug": "dataset/AAA",
+        "entity": 1,
     }
 
     with pytest.raises(ValueError, match="^entry-date cannot be in the future$"):
@@ -149,7 +149,7 @@ def test_development_agreement_type_model():
         "name": "BBB",
         "entry-date": "2020-10-04",
         "start-date": "2020-10-05",
-        "slug": "developer-agreement-type/AAA",
+        "entity": 1,
         "extra_field": "CCC",
     }
 
@@ -161,7 +161,7 @@ def test_development_agreement_type_model():
 
     assert orm_obj.name == test_data["name"]
     assert orm_obj.start_date == test_data["start_date"]
-    assert orm_obj.slug.slug == test_data["slug"]
+    assert orm_obj.entity == test_data["entity"]
 
 
 def test_geography_dataset_model(mocker):
@@ -172,11 +172,11 @@ def test_geography_dataset_model(mocker):
         "entry-date": "2020-10-04",
         "start-date": "2020-10-05",
         "organisation": "government-organisation:CCC",
-        "slug": "local-authority-district/AAA",
+        "entity": 1,
         "extra_field": "ZZZ",
     }
     test_organisation = Organisation(
-        id=1, organisation="government-organisation:CCC", name="some organisation"
+        entity=1, organisation="government-organisation:CCC", name="some organisation"
     )
     mocker.patch(
         "view_builder.model.dataset.GeographyDatasetModel.get_organisation",
@@ -191,7 +191,7 @@ def test_geography_dataset_model(mocker):
     assert isinstance(first_orm_obj, Geography)
     assert first_orm_obj.geography == test_data["geography"]
     assert first_orm_obj.geometry == test_data["geometry"]
-    assert first_orm_obj.slug.slug == test_data["slug"]
+    assert first_orm_obj.entity == test_data["entity"]
 
     second_orm_obj = orm_obj_list[1]
     assert isinstance(second_orm_obj, OrganisationGeography)
@@ -213,7 +213,7 @@ def test_development_policy_model(
         "entry-date": "2020-10-04",
         "start-date": "2020-10-05",
         "organisation": "government-organisation:CCC",
-        "slug": "/development-policy/local-authority-eng/CCC/AAA",
+        "entity": 1,
         "notes": "ZZZ",
         "description": "a description",
     }
@@ -229,7 +229,7 @@ def test_development_policy_model(
     assert first_orm_obj.name == test_data["name"]
     assert first_orm_obj.notes == test_data["notes"]
     assert first_orm_obj.description == test_data["description"]
-    assert first_orm_obj.slug.slug == test_data["slug"]
+    assert first_orm_obj.entity == test_data["entity"]
 
     assert (
         len(
@@ -288,7 +288,7 @@ def test_development_plan_document_model(
         "start-date": "2020-10-05",
         "organisations": "government-organisation:CCC",
         "document-url": "www.example.com",
-        "slug": "/development-plan-document/local-authority-eng/CCC/AAA",
+        "entity": 1,
         "notes": "ZZZ",
         "description": "a description",
     }
@@ -304,7 +304,7 @@ def test_development_plan_document_model(
     assert first_orm_obj.name == test_data["name"]
     assert first_orm_obj.notes == test_data["notes"]
     assert first_orm_obj.description == test_data["description"]
-    assert first_orm_obj.slug.slug == test_data["slug"]
+    assert first_orm_obj.entity == test_data["entity"]
     assert first_orm_obj.document_url == test_data["document-url"]
 
     assert (
@@ -361,34 +361,34 @@ def test_development_plan_document_model(
 
 
 @pytest.fixture
-def mock_get_geography_slug(mocker):
-    ret = dummy_slug
+def mock_get_geography_entity(mocker):
+    ret = dummy_entity
     ret.geography = [dummy_geography]
     mock_db = mocker.patch(
-        "view_builder.model.dataset.DatasetModel.get_slug",
-        lambda self, slug: ret,
+        "view_builder.model.dataset.DatasetModel.get_entity",
+        lambda self, entity: ret,
     )
     return mock_db
 
 
 @pytest.mark.usefixtures("mock_get_organisation")
-@pytest.mark.usefixtures("mock_get_geography_slug")
+@pytest.mark.usefixtures("mock_get_geography_entity")
 @pytest.mark.usefixtures("mock_get_category")
 @pytest.mark.usefixtures("mock_get_policy")
 def test_document_model(
-    mock_get_organisation, mock_get_geography_slug, mock_get_category, mock_get_policy
+    mock_get_organisation, mock_get_geography_entity, mock_get_category, mock_get_policy
 ):
     test_data = {
         "document": "AAA",
         "name": "BBB",
         "document-types": "A;B",
         "development-policies": "pol-a;pol-b",
-        "geographies": "/a/slug/example;/a/slug/example/b",
+        "geographies": "1;2",
         "entry-date": "2020-10-04",
         "start-date": "2020-10-05",
         "organisations": "local-authority-eng:CCC",
         "document-url": "www.example.com",
-        "slug": "/document/area/CCC/AAA",
+        "entity": 3,
         "notes": "ZZZ",
         "description": "a description",
     }
@@ -404,7 +404,7 @@ def test_document_model(
     assert first_orm_obj.name == test_data["name"]
     assert first_orm_obj.notes == test_data["notes"]
     assert first_orm_obj.description == test_data["description"]
-    assert first_orm_obj.slug.slug == test_data["slug"]
+    assert first_orm_obj.entity == test_data["entity"]
     assert first_orm_obj.document_url == test_data["document-url"]
 
     assert (
@@ -480,7 +480,7 @@ def test_brownfield_land_model(mocker, mock_get_organisation):
         "entry-date": "2020-10-04",
         "start-date": "2020-10-05",
         "organisation": "government-organisation:CCC",
-        "slug": "/brownfield-land/development-corporation/AAA",
+        "entity": 1,
         "extra_field": "ZZZ",
     }
 
@@ -498,7 +498,9 @@ def test_brownfield_land_model(mocker, mock_get_organisation):
 
     mocker.patch(
         "view_builder.model.dataset.BrownfieldLandModel.get_category",
-        lambda self, category, type: Category(id=1, category=category, name=category),
+        lambda self, category, type: Category(
+            entity=1, category=category, name=category
+        ),
     )
 
     brownfield_orm = BrownfieldLandModel(None, test_data)

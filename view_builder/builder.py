@@ -1,6 +1,7 @@
 import logging
 
 from sqlalchemy.orm import Session
+from tqdm import tqdm
 
 
 class ViewBuilder:
@@ -14,11 +15,13 @@ class ViewBuilder:
     def init_model(self, metadata):
         metadata.create_all(self._engine)
 
-    def build_model(self, dataset_name, reader):
+    def build_model(self, dataset_name, reader, total=None):
         with Session(self._engine) as session:
-            for item in reader:
-                orm_objects = self._item_mapper(dataset_name, session, item)
-                for obj in orm_objects:
-                    session.add(obj)
+            with tqdm(total=total, miniters=500) as pbar:
+                for item in reader:
+                    orm_objects = self._item_mapper(dataset_name, session, item)
+                    for obj in orm_objects:
+                        session.add(obj)
+                    pbar.update(1)
 
             session.commit()
