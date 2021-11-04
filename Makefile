@@ -41,7 +41,7 @@ DATASETS=\
     	$(CACHE_DIR)site-of-special-scientific-interest.sqlite3\
 	$(CACHE_DIR)open-space.sqlite3
 
-all:: build
+all:: collect build postprocess generate-tiles
 
 collect: $(CACHE_DIR)organisation.csv $(DATASETS)
 
@@ -95,9 +95,11 @@ generate-tiles: tippecanoe-check
 	tr '\n' , < $(CACHE_DIR)geometry.txt > $(CACHE_DIR)geometry.geojson
 	tippecanoe -z15 -Z4 -r1 --no-feature-limit --no-tile-size-limit -o $(CACHE_DIR)dataset_tiles.mbtiles $(CACHE_DIR)geometry.geojson
 
-push:
+push-dataset:
 	aws s3 sync $(CACHE_DIR) s3://digital-land-view-model --exclude='*' --include='view_model.sqlite3' --include='*.mbtiles'
 
+aws-build::
+	aws batch submit-job --job-name view_model-$(shell date '+%Y-%m-%d-%H-%M-%S') --job-queue dl-batch-queue --job-definition dl-batch-def --container-overrides '{"environment": [{"name":"BATCH_FILE_S3_URL","value":"s3://dl-batch-scripts/builder_run.sh"}, {"name" : "BUILDER_REPO","value" : "view-builder"}]}'
 
 $(CACHE_DIR)organisation.csv:
 	@mkdir -p $(CACHE_DIR)
