@@ -57,8 +57,8 @@ flake8:
 	flake8 .
 
 clobber::
-	rm $(VIEW_MODEL_DB)
-	rm $(CACHE_DIR)*
+	rm -rf $(VIEW_MODEL_DB)
+	rm -rf $(CACHE_DIR)*
 
 docker-check:
 ifeq (, $(shell which docker))
