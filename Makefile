@@ -98,6 +98,7 @@ postprocess:
 	docker build -t sqlite3-spatialite -f SqliteDockerfile .
 	docker run -t --mount src=$(SHARED_VOL),target=/tmp,type=bind sqlite3-spatialite -init ./post_process.sql -bail -echo  /tmp/view_model.sqlite3
 	cp $(SHARED_DIR)view_model.sqlite3 $(CACHE_DIR)
+	cp $(SHARED_DIR)geometry.txt $(CACHE_DIR)
 
 generate-tiles: tippecanoe-check
 	view_builder build-tiles $(VIEW_MODEL_DB) $(CACHE_DIR)
