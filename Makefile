@@ -41,6 +41,10 @@ DATASETS=\
     	$(CACHE_DIR)site-of-special-scientific-interest.sqlite3\
 	$(CACHE_DIR)open-space.sqlite3
 
+ifeq ($(SHARED_VOL),)
+SHARED_VOL=tmp/
+endif
+
 all:: collect build postprocess generate-tiles
 
 collect: $(CACHE_DIR)organisation.csv $(DATASETS)
@@ -85,8 +89,11 @@ $(VIEW_MODEL_DB):
 
 
 postprocess:
+	@mkdir -p $(SHARED_VOL)
+	cp $(VIEW_MODEL_DB) $(SHARED_VOL)
 	docker build -t sqlite3-spatialite -f SqliteDockerfile .
-	docker run -t --mount src=$(shell pwd),target=/tmp,type=bind sqlite3-spatialite -init ./post_process.sql -bail -echo  /tmp/$(CACHE_DIR)view_model.sqlite3 .exit
+	docker run -t --mount src=$(shell pwd)/$(SHARED_VOL),target=/tmp,type=bind sqlite3-spatialite -init ./post_process.sql -bail -echo  /tmp/view_model.sqlite3
+	cp $(SHARED_VOL)view_model.sqlite3 $(CACHE_DIR)
 
 generate-tiles: tippecanoe-check
 	view_builder build-tiles $(VIEW_MODEL_DB) $(CACHE_DIR)
